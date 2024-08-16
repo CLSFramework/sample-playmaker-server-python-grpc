@@ -75,7 +75,6 @@ class GameHandler(pb2_grpc.GameServicer):
         logging.debug(f"Server params received unum {serverParams.register_response.uniform_number}")
         self.server_params = serverParams
         res = pb2.Empty()
-        # logging.debug(f"Server params Done unum {serverParams.register_response.uniform_number}")
         return res
 
     def SendPlayerParams(self, playerParams: pb2.PlayerParam, context):
@@ -128,31 +127,7 @@ def serve(port):
     logging.info(f"Starting server on port {port}")
     
     server.wait_for_termination()
-
-    # while True:
-    #     with shared_lock:
-    #         logging.debug(f"Waiting for connections {shared_number_of_connections.value}")
-    #         if shared_number_of_connections.value != 0:
-    #             break
-    #     sleep(1)
-
-# def serve(port):
-#     handler = GameHandler()
-#     processor = Game.Processor(handler)
-#     transport = TSocket.TServerSocket(host='0.0.0.0', port=port)
-#     tfactory = TTransport.TBufferedTransportFactory()
-#     pfactory = TBinaryProtocol.TBinaryProtocolFactory()
-
-#     server = PFProcessServer(processor, transport, tfactory, pfactory)
-#     # server = TThreadedServer(processor, transport, tfactory, pfactory)
-
-#     logging.info(f"Starting server on port {port}")
-#     try:
-#         server.serve()
-#     except KeyboardInterrupt:
-#         server.stop()
-#         print("Stopping server")
-
+    
 
 if __name__ == '__main__':
     serve(50051)
