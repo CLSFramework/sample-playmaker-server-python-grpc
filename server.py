@@ -13,16 +13,24 @@ manager = Manager()
 shared_lock = Lock()  # Create a Lock for synchronization
 shared_number_of_connections = manager.Value('i', 0)
 
-
-class GameHandler(pb2_grpc.GameServicer):
-    def __init__(self):
+class GrpcAgent:
+    def __init__(self, agent_type, uniform_number) -> None:
+        self.agent_type: pb2.AgentType = agent_type
+        self.uniform_number: int = uniform_number
         self.server_params: Union[pb2.ServerParam, None] = None
         self.player_params: Union[pb2.PlayerParam, None] = None
         self.player_types: dict[int, pb2.PlayerType] = {}
         self.debug_mode: bool = False
-
-    def GetPlayerActions(self, state: pb2.State, context):
-        logging.debug(f"GetPlayerActions unum {state.register_response.uniform_number} at {state.world_model.cycle}")
+    
+    def GetAction(self, state: pb2.State):
+        if self.agent_type == pb2.AgentType.Player:
+            return self.GetPlayerActions(state)
+        elif self.agent_type == pb2.AgentType.Coach:
+            return self.GetCoachActions(state)
+        elif self.agent_type == pb2.AgentType.Trainer:
+            return self.GetTrainerActions(state)
+        
+    def GetPlayerActions(self, state: pb2.State):
         actions = []
         if state.world_model.game_mode_type == pb2.GameModeType.PlayOn:
             if state.world_model.self.is_goalie:
@@ -41,19 +49,14 @@ class GameHandler(pb2_grpc.GameServicer):
                 actions.append(pb2.PlayerAction(helios_basic_move=pb2.HeliosBasicMove()))
         else:
             actions.append(pb2.PlayerAction(helios_set_play=pb2.HeliosSetPlay()))
-
-        res = pb2.PlayerActions(actions=actions)
-        logging.debug(f"GetPlayerActions Done unum {actions}")
-        return res
-
-    def GetCoachActions(self, state: pb2.State, context):
-        logging.debug(f"GetCoachActions coach at {state.world_model.cycle}")
+        return pb2.PlayerActions(actions=actions)
+    
+    def GetCoachActions(self, state: pb2.State):
         actions = []
         actions.append(pb2.CoachAction(do_helios_substitute=pb2.DoHeliosSubstitute()))
         return pb2.CoachActions(actions=actions)
-
-    def GetTrainerActions(self, state: pb2.State, context):
-        logging.debug(f"GetTrainerActions trainer at {state.world_model.cycle}")
+    
+    def GetTrainerActions(self, state: pb2.State):
         actions = []
         actions.append(
             pb2.TrainerAction(
@@ -70,28 +73,48 @@ class GameHandler(pb2_grpc.GameServicer):
             )
         )
         return pb2.TrainerActions(actions=actions)
+        
+class GameHandler(pb2_grpc.GameServicer):
+    def __init__(self):
+        self.agents: dict[int, GrpcAgent] = {}
+
+    def GetPlayerActions(self, state: pb2.State, context):
+        logging.debug(f"GetPlayerActions unum {state.register_response.uniform_number} at {state.world_model.cycle}")
+        res = self.agents[state.register_response.client_id].GetAction(state)
+        logging.debug(f"GetPlayerActions Done unum {res}")
+        return res
+
+    def GetCoachActions(self, state: pb2.State, context):
+        logging.debug(f"GetCoachActions coach at {state.world_model.cycle}")
+        res = self.agents[state.register_response.client_id].GetAction(state)
+        return res
+
+    def GetTrainerActions(self, state: pb2.State, context):
+        logging.debug(f"GetTrainerActions trainer at {state.world_model.cycle}")
+        res = self.agents[state.register_response.client_id].GetAction(state)
+        return res
 
     def SendServerParams(self, serverParams: pb2.ServerParam, context):
         logging.debug(f"Server params received unum {serverParams.register_response.uniform_number}")
-        self.server_params = serverParams
+        self.agents[serverParams.register_response.client_id].server_params = serverParams
         res = pb2.Empty()
         return res
 
     def SendPlayerParams(self, playerParams: pb2.PlayerParam, context):
         logging.debug(f"Player params received unum {playerParams.register_response.uniform_number}")
-        self.player_params = playerParams
+        self.agents[playerParams.register_response.client_id].player_params = playerParams
         res = pb2.Empty()
         return res
 
     def SendPlayerType(self, playerType: pb2.PlayerType, context):
         logging.debug(f"Player type received unum {playerType.register_response.uniform_number}")
-        self.player_types[playerType.id] = playerType
+        self.agents[playerType.register_response.client_id].player_types[playerType.id] = playerType
         res = pb2.Empty()
         return res
 
     def SendInitMessage(self, initMessage: pb2.InitMessage, context):
         logging.debug(f"Init message received unum {initMessage.register_response.uniform_number}")
-        self.debug_mode = initMessage.debug_mode
+        self.agents[initMessage.register_response.client_id].debug_mode = initMessage.debug_mode
         res = pb2.Empty()
         return res
 
@@ -105,6 +128,7 @@ class GameHandler(pb2_grpc.GameServicer):
             team_name = register_request.team_name
             uniform_number = register_request.uniform_number
             agent_type = register_request.agent_type
+            self.agents.append(shared_number_of_connections.value, GrpcAgent(agent_type, unuiform_number))
             res = pb2.RegisterResponse(client_id=shared_number_of_connections.value,
                                    team_name=team_name,
                                    uniform_number=uniform_number,
@@ -114,7 +138,8 @@ class GameHandler(pb2_grpc.GameServicer):
     def SendByeCommand(self, register_response: pb2.RegisterResponse):
         logging.debug(f"Bye command received unum {register_response.uniform_number}")
         with shared_lock:
-            shared_number_of_connections.value -= 1
+            self.agents.pop(register_response.client_id)
+            
         res = pb2.Empty()
         return res
 
