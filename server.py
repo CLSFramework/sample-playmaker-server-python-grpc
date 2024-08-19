@@ -124,21 +124,21 @@ class GameHandler(pb2_grpc.GameServicer):
                       f"agent_type: {register_request.agent_type}")
         with shared_lock:
             shared_number_of_connections.value += 1
-            logging.debug(f"Number of connections {shared_number_of_connections.value}")
-            team_name = register_request.team_name
-            uniform_number = register_request.uniform_number
-            agent_type = register_request.agent_type
-            self.agents.append(shared_number_of_connections.value, GrpcAgent(agent_type, uniform_number))
-            res = pb2.RegisterResponse(client_id=shared_number_of_connections.value,
-                                   team_name=team_name,
-                                   uniform_number=uniform_number,
-                                   agent_type=agent_type)
+        logging.debug(f"Number of connections {shared_number_of_connections.value}")
+        team_name = register_request.team_name
+        uniform_number = register_request.uniform_number
+        agent_type = register_request.agent_type
+        self.agents.append(shared_number_of_connections.value, GrpcAgent(agent_type, uniform_number))
+        res = pb2.RegisterResponse(client_id=shared_number_of_connections.value,
+                                team_name=team_name,
+                                uniform_number=uniform_number,
+                                agent_type=agent_type)
         return res
 
     def SendByeCommand(self, register_response: pb2.RegisterResponse):
         logging.debug(f"Bye command received unum {register_response.uniform_number}")
-        with shared_lock:
-            self.agents.pop(register_response.client_id)
+        # with shared_lock:
+        self.agents.pop(register_response.client_id)
             
         res = pb2.Empty()
         return res
