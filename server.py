@@ -128,7 +128,7 @@ class GameHandler(pb2_grpc.GameServicer):
             team_name = register_request.team_name
             uniform_number = register_request.uniform_number
             agent_type = register_request.agent_type
-            self.agents.append(shared_number_of_connections.value, GrpcAgent(agent_type, unuiform_number))
+            self.agents.append(shared_number_of_connections.value, GrpcAgent(agent_type, uniform_number))
             res = pb2.RegisterResponse(client_id=shared_number_of_connections.value,
                                    team_name=team_name,
                                    uniform_number=uniform_number,
