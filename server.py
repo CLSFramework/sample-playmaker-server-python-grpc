@@ -23,11 +23,11 @@ class GrpcAgent:
         self.debug_mode: bool = False
     
     def GetAction(self, state: pb2.State):
-        if self.agent_type == pb2.AgentType.Player:
+        if self.agent_type == pb2.AgentType.PlayerT:
             return self.GetPlayerActions(state)
-        elif self.agent_type == pb2.AgentType.Coach:
+        elif self.agent_type == pb2.AgentType.CoachT:
             return self.GetCoachActions(state)
-        elif self.agent_type == pb2.AgentType.Trainer:
+        elif self.agent_type == pb2.AgentType.TrainerT:
             return self.GetTrainerActions(state)
         
     def GetPlayerActions(self, state: pb2.State):
@@ -128,14 +128,14 @@ class GameHandler(pb2_grpc.GameServicer):
         team_name = register_request.team_name
         uniform_number = register_request.uniform_number
         agent_type = register_request.agent_type
-        self.agents.append(shared_number_of_connections.value, GrpcAgent(agent_type, uniform_number))
+        self.agents[shared_number_of_connections.value] = GrpcAgent(agent_type, uniform_number)
         res = pb2.RegisterResponse(client_id=shared_number_of_connections.value,
                                 team_name=team_name,
                                 uniform_number=uniform_number,
                                 agent_type=agent_type)
         return res
 
-    def SendByeCommand(self, register_response: pb2.RegisterResponse):
+    def SendByeCommand(self, register_response: pb2.RegisterResponse, context):
         logging.debug(f"Bye command received unum {register_response.uniform_number}")
         # with shared_lock:
         self.agents.pop(register_response.client_id)
