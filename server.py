@@ -6,12 +6,11 @@ from typing import Union
 from multiprocessing import Manager, Lock
 import logging
 import grpc
+import argparse
+
 
 logging.basicConfig(level=logging.DEBUG)
 
-manager = Manager()
-shared_lock = Lock()  # Create a Lock for synchronization
-shared_number_of_connections = manager.Value('i', 0)
 
 class GrpcAgent:
     def __init__(self, agent_type, uniform_number) -> None:
@@ -75,8 +74,10 @@ class GrpcAgent:
         return pb2.TrainerActions(actions=actions)
         
 class GameHandler(pb2_grpc.GameServicer):
-    def __init__(self):
+    def __init__(self, shared_lock, shared_number_of_connections) -> None:
         self.agents: dict[int, GrpcAgent] = {}
+        self.shared_lock = shared_lock
+        self.shared_number_of_connections = shared_number_of_connections
 
     def GetPlayerActions(self, state: pb2.State, context):
         logging.debug(f"GetPlayerActions unum {state.register_response.uniform_number} at {state.world_model.cycle}")
@@ -122,14 +123,14 @@ class GameHandler(pb2_grpc.GameServicer):
         logging.debug(f"received register request from team_name: {register_request.team_name} "
                       f"unum: {register_request.uniform_number} "
                       f"agent_type: {register_request.agent_type}")
-        with shared_lock:
-            shared_number_of_connections.value += 1
-        logging.debug(f"Number of connections {shared_number_of_connections.value}")
+        with self.shared_lock:
+            self.shared_number_of_connections.value += 1
+        logging.debug(f"Number of connections {self.shared_number_of_connections.value}")
         team_name = register_request.team_name
         uniform_number = register_request.uniform_number
         agent_type = register_request.agent_type
-        self.agents[shared_number_of_connections.value] = GrpcAgent(agent_type, uniform_number)
-        res = pb2.RegisterResponse(client_id=shared_number_of_connections.value,
+        self.agents[self.shared_number_of_connections.value] = GrpcAgent(agent_type, uniform_number)
+        res = pb2.RegisterResponse(client_id=self.shared_number_of_connections.value,
                                 team_name=team_name,
                                 uniform_number=uniform_number,
                                 agent_type=agent_type)
@@ -143,9 +144,9 @@ class GameHandler(pb2_grpc.GameServicer):
         res = pb2.Empty()
         return res
 
-def serve(port):
+def serve(port, shared_lock, shared_number_of_connections):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=22))
-    game_service = GameHandler()
+    game_service = GameHandler(shared_lock, shared_number_of_connections)
     pb2_grpc.add_GameServicer_to_server(game_service, server)
     server.add_insecure_port(f'[::]:{port}')
     server.start()
@@ -154,5 +155,15 @@ def serve(port):
     server.wait_for_termination()
     
 
+def main():
+    manager = Manager()
+    shared_lock = Lock()  # Create a Lock for synchronization
+    shared_number_of_connections = manager.Value('i', 0)
+    parser = argparse.ArgumentParser(description='Run play maker server')
+    parser.add_argument('-p', '--rpc-port', required=False, help='The port of the server', default=50051)
+    args = parser.parse_args()
+    serve(args.rpc_port, shared_lock, shared_number_of_connections)
+    
 if __name__ == '__main__':
-    serve(50051)
+    main()
+    
