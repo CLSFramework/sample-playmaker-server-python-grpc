@@ -91,6 +91,16 @@ class AgentType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     PlayerT: _ClassVar[AgentType]
     CoachT: _ClassVar[AgentType]
     TrainerT: _ClassVar[AgentType]
+
+class RpcActionCategory(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    AC_Hold: _ClassVar[RpcActionCategory]
+    AC_Dribble: _ClassVar[RpcActionCategory]
+    AC_Pass: _ClassVar[RpcActionCategory]
+    AC_Shoot: _ClassVar[RpcActionCategory]
+    AC_Clear: _ClassVar[RpcActionCategory]
+    AC_Move: _ClassVar[RpcActionCategory]
+    AC_NoAction: _ClassVar[RpcActionCategory]
 NARROW: ViewWidth
 NORMAL: ViewWidth
 WIDE: ViewWidth
@@ -159,6 +169,13 @@ MODE_MAX: GameModeType
 PlayerT: AgentType
 CoachT: AgentType
 TrainerT: AgentType
+AC_Hold: RpcActionCategory
+AC_Dribble: RpcActionCategory
+AC_Pass: RpcActionCategory
+AC_Shoot: RpcActionCategory
+AC_Clear: RpcActionCategory
+AC_Move: RpcActionCategory
+AC_NoAction: RpcActionCategory
 
 class RpcVector2D(_message.Message):
     __slots__ = ("x", "y", "dist", "angle")
@@ -1280,7 +1297,7 @@ class HeliosShoot(_message.Message):
     def __init__(self) -> None: ...
 
 class HeliosChainAction(_message.Message):
-    __slots__ = ("direct_pass", "lead_pass", "through_pass", "short_dribble", "long_dribble", "cross", "simple_pass", "simple_dribble", "simple_shoot")
+    __slots__ = ("direct_pass", "lead_pass", "through_pass", "short_dribble", "long_dribble", "cross", "simple_pass", "simple_dribble", "simple_shoot", "server_side_decision")
     DIRECT_PASS_FIELD_NUMBER: _ClassVar[int]
     LEAD_PASS_FIELD_NUMBER: _ClassVar[int]
     THROUGH_PASS_FIELD_NUMBER: _ClassVar[int]
@@ -1290,6 +1307,7 @@ class HeliosChainAction(_message.Message):
     SIMPLE_PASS_FIELD_NUMBER: _ClassVar[int]
     SIMPLE_DRIBBLE_FIELD_NUMBER: _ClassVar[int]
     SIMPLE_SHOOT_FIELD_NUMBER: _ClassVar[int]
+    SERVER_SIDE_DECISION_FIELD_NUMBER: _ClassVar[int]
     direct_pass: bool
     lead_pass: bool
     through_pass: bool
@@ -1299,7 +1317,8 @@ class HeliosChainAction(_message.Message):
     simple_pass: bool
     simple_dribble: bool
     simple_shoot: bool
-    def __init__(self, direct_pass: bool = ..., lead_pass: bool = ..., through_pass: bool = ..., short_dribble: bool = ..., long_dribble: bool = ..., cross: bool = ..., simple_pass: bool = ..., simple_dribble: bool = ..., simple_shoot: bool = ...) -> None: ...
+    server_side_decision: bool
+    def __init__(self, direct_pass: bool = ..., lead_pass: bool = ..., through_pass: bool = ..., short_dribble: bool = ..., long_dribble: bool = ..., cross: bool = ..., simple_pass: bool = ..., simple_dribble: bool = ..., simple_shoot: bool = ..., server_side_decision: bool = ...) -> None: ...
 
 class HeliosBasicOffensive(_message.Message):
     __slots__ = ()
@@ -2144,6 +2163,91 @@ class PlayerType(_message.Message):
     cycles_to_reach_max_speed: int
     player_speed_max: float
     def __init__(self, register_response: _Optional[_Union[RegisterResponse, _Mapping]] = ..., id: _Optional[int] = ..., stamina_inc_max: _Optional[float] = ..., player_decay: _Optional[float] = ..., inertia_moment: _Optional[float] = ..., dash_power_rate: _Optional[float] = ..., player_size: _Optional[float] = ..., kickable_margin: _Optional[float] = ..., kick_rand: _Optional[float] = ..., extra_stamina: _Optional[float] = ..., effort_max: _Optional[float] = ..., effort_min: _Optional[float] = ..., kick_power_rate: _Optional[float] = ..., foul_detect_probability: _Optional[float] = ..., catchable_area_l_stretch: _Optional[float] = ..., unum_far_length: _Optional[float] = ..., unum_too_far_length: _Optional[float] = ..., team_far_length: _Optional[float] = ..., team_too_far_length: _Optional[float] = ..., player_max_observation_length: _Optional[float] = ..., ball_vel_far_length: _Optional[float] = ..., ball_vel_too_far_length: _Optional[float] = ..., ball_max_observation_length: _Optional[float] = ..., flag_chg_far_length: _Optional[float] = ..., flag_chg_too_far_length: _Optional[float] = ..., flag_max_observation_length: _Optional[float] = ..., kickable_area: _Optional[float] = ..., reliable_catchable_dist: _Optional[float] = ..., max_catchable_dist: _Optional[float] = ..., real_speed_max: _Optional[float] = ..., player_speed_max2: _Optional[float] = ..., real_speed_max2: _Optional[float] = ..., cycles_to_reach_max_speed: _Optional[int] = ..., player_speed_max: _Optional[float] = ...) -> None: ...
+
+class RpcCooperativeAction(_message.Message):
+    __slots__ = ("category", "index", "sender_unum", "target_unum", "target_point", "first_ball_speed", "first_turn_moment", "first_dash_power", "first_dash_angle_relative", "duration_step", "kick_count", "turn_count", "dash_count", "final_action", "description", "parent_index")
+    CATEGORY_FIELD_NUMBER: _ClassVar[int]
+    INDEX_FIELD_NUMBER: _ClassVar[int]
+    SENDER_UNUM_FIELD_NUMBER: _ClassVar[int]
+    TARGET_UNUM_FIELD_NUMBER: _ClassVar[int]
+    TARGET_POINT_FIELD_NUMBER: _ClassVar[int]
+    FIRST_BALL_SPEED_FIELD_NUMBER: _ClassVar[int]
+    FIRST_TURN_MOMENT_FIELD_NUMBER: _ClassVar[int]
+    FIRST_DASH_POWER_FIELD_NUMBER: _ClassVar[int]
+    FIRST_DASH_ANGLE_RELATIVE_FIELD_NUMBER: _ClassVar[int]
+    DURATION_STEP_FIELD_NUMBER: _ClassVar[int]
+    KICK_COUNT_FIELD_NUMBER: _ClassVar[int]
+    TURN_COUNT_FIELD_NUMBER: _ClassVar[int]
+    DASH_COUNT_FIELD_NUMBER: _ClassVar[int]
+    FINAL_ACTION_FIELD_NUMBER: _ClassVar[int]
+    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
+    PARENT_INDEX_FIELD_NUMBER: _ClassVar[int]
+    category: RpcActionCategory
+    index: int
+    sender_unum: int
+    target_unum: int
+    target_point: RpcVector2D
+    first_ball_speed: float
+    first_turn_moment: float
+    first_dash_power: float
+    first_dash_angle_relative: float
+    duration_step: int
+    kick_count: int
+    turn_count: int
+    dash_count: int
+    final_action: bool
+    description: str
+    parent_index: int
+    def __init__(self, category: _Optional[_Union[RpcActionCategory, str]] = ..., index: _Optional[int] = ..., sender_unum: _Optional[int] = ..., target_unum: _Optional[int] = ..., target_point: _Optional[_Union[RpcVector2D, _Mapping]] = ..., first_ball_speed: _Optional[float] = ..., first_turn_moment: _Optional[float] = ..., first_dash_power: _Optional[float] = ..., first_dash_angle_relative: _Optional[float] = ..., duration_step: _Optional[int] = ..., kick_count: _Optional[int] = ..., turn_count: _Optional[int] = ..., dash_count: _Optional[int] = ..., final_action: bool = ..., description: _Optional[str] = ..., parent_index: _Optional[int] = ...) -> None: ...
+
+class RpcPredictState(_message.Message):
+    __slots__ = ("spend_time", "ball_holder_unum", "ball_position", "ball_velocity", "our_defense_line_x", "our_offense_line_x")
+    SPEND_TIME_FIELD_NUMBER: _ClassVar[int]
+    BALL_HOLDER_UNUM_FIELD_NUMBER: _ClassVar[int]
+    BALL_POSITION_FIELD_NUMBER: _ClassVar[int]
+    BALL_VELOCITY_FIELD_NUMBER: _ClassVar[int]
+    OUR_DEFENSE_LINE_X_FIELD_NUMBER: _ClassVar[int]
+    OUR_OFFENSE_LINE_X_FIELD_NUMBER: _ClassVar[int]
+    spend_time: int
+    ball_holder_unum: int
+    ball_position: RpcVector2D
+    ball_velocity: RpcVector2D
+    our_defense_line_x: float
+    our_offense_line_x: float
+    def __init__(self, spend_time: _Optional[int] = ..., ball_holder_unum: _Optional[int] = ..., ball_position: _Optional[_Union[RpcVector2D, _Mapping]] = ..., ball_velocity: _Optional[_Union[RpcVector2D, _Mapping]] = ..., our_defense_line_x: _Optional[float] = ..., our_offense_line_x: _Optional[float] = ...) -> None: ...
+
+class RpcActionState(_message.Message):
+    __slots__ = ("action", "predict_state", "evaluation")
+    ACTION_FIELD_NUMBER: _ClassVar[int]
+    PREDICT_STATE_FIELD_NUMBER: _ClassVar[int]
+    EVALUATION_FIELD_NUMBER: _ClassVar[int]
+    action: RpcCooperativeAction
+    predict_state: RpcPredictState
+    evaluation: float
+    def __init__(self, action: _Optional[_Union[RpcCooperativeAction, _Mapping]] = ..., predict_state: _Optional[_Union[RpcPredictState, _Mapping]] = ..., evaluation: _Optional[float] = ...) -> None: ...
+
+class BestPlannerActionRequest(_message.Message):
+    __slots__ = ("register_response", "pairs", "state")
+    class PairsEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: int
+        value: RpcActionState
+        def __init__(self, key: _Optional[int] = ..., value: _Optional[_Union[RpcActionState, _Mapping]] = ...) -> None: ...
+    REGISTER_RESPONSE_FIELD_NUMBER: _ClassVar[int]
+    PAIRS_FIELD_NUMBER: _ClassVar[int]
+    STATE_FIELD_NUMBER: _ClassVar[int]
+    register_response: RegisterResponse
+    pairs: _containers.MessageMap[int, RpcActionState]
+    state: State
+    def __init__(self, register_response: _Optional[_Union[RegisterResponse, _Mapping]] = ..., pairs: _Optional[_Mapping[int, RpcActionState]] = ..., state: _Optional[_Union[State, _Mapping]] = ...) -> None: ...
+
+class BestPlannerActionResponse(_message.Message):
+    __slots__ = ("index",)
+    INDEX_FIELD_NUMBER: _ClassVar[int]
+    index: int
+    def __init__(self, index: _Optional[int] = ...) -> None: ...
 
 class Empty(_message.Message):
     __slots__ = ()

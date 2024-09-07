@@ -9,8 +9,23 @@ import grpc
 import argparse
 
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
+#put log into file as well as console
+# Create a custom logger
+logger = logging.getLogger('my_logger')
+logger.setLevel(logging.DEBUG)  # Set the minimum logging level
 
+# Create handlers: one for console, one for file
+console_handler = logging.StreamHandler()
+file_handler = logging.FileHandler('logfile.log')
+
+# Set logging level for each handler
+console_handler.setLevel(logging.ERROR)
+file_handler.setLevel(logging.INFO)
+
+# Add the handlers to the logger
+logger.addHandler(console_handler)
+logger.addHandler(file_handler)
 
 class GrpcAgent:
     def __init__(self, agent_type, uniform_number) -> None:
@@ -40,9 +55,10 @@ class GrpcAgent:
                                                                                   through_pass=True,
                                                                                   simple_pass=True,
                                                                                   short_dribble=True,
-                                                                                  long_dribble=True,
+                                                                                  long_dribble=False,
                                                                                   simple_shoot=True,
                                                                                   simple_dribble=True,
+                                                                                  server_side_decision=True,
                                                                                   cross=True)))
             else:
                 actions.append(pb2.PlayerAction(helios_basic_move=pb2.HeliosBasicMove()))
@@ -125,15 +141,15 @@ class GameHandler(pb2_grpc.GameServicer):
                       f"agent_type: {register_request.agent_type}")
         with self.shared_lock:
             self.shared_number_of_connections.value += 1
-        logging.debug(f"Number of connections {self.shared_number_of_connections.value}")
-        team_name = register_request.team_name
-        uniform_number = register_request.uniform_number
-        agent_type = register_request.agent_type
-        self.agents[self.shared_number_of_connections.value] = GrpcAgent(agent_type, uniform_number)
-        res = pb2.RegisterResponse(client_id=self.shared_number_of_connections.value,
-                                team_name=team_name,
-                                uniform_number=uniform_number,
-                                agent_type=agent_type)
+            logging.debug(f"Number of connections {self.shared_number_of_connections.value}")
+            team_name = register_request.team_name
+            uniform_number = register_request.uniform_number
+            agent_type = register_request.agent_type
+            self.agents[self.shared_number_of_connections.value] = GrpcAgent(agent_type, uniform_number)
+            res = pb2.RegisterResponse(client_id=self.shared_number_of_connections.value,
+                                    team_name=team_name,
+                                    uniform_number=uniform_number,
+                                    agent_type=agent_type)
         return res
 
     def SendByeCommand(self, register_response: pb2.RegisterResponse, context):
@@ -142,6 +158,22 @@ class GameHandler(pb2_grpc.GameServicer):
         self.agents.pop(register_response.client_id)
             
         res = pb2.Empty()
+        return res
+    
+    def GetBestPlannerAction(self, pairs: pb2.BestPlannerActionRequest, context):
+        logger.error(f"GetBestPlannerAction cycle:{pairs.state.world_model.cycle} pairs:{len(pairs.pairs)} unum:{pairs.state.register_response.uniform_number}")
+        pairs_list: list[int, pb2.RpcActionState] = [(k, v) for k, v in pairs.pairs.items()]
+        pairs_list.sort(key=lambda x: x[0])
+        
+        # for p in pairs_list:
+        #     pair: pb2.RpcActionStatePair = p[1]
+        #     logger.info(f"i:{p[0]} p:{pair.action.parent_index} {p[1].action.description} to {p[1].action.target_unum} in ({round(p[1].action.target_point.x, 2)},{round(p[1].action.target_point.y, 2)}) e:{round(p[1].evaluation,2)}")
+        
+        best_action = max(pairs_list, key=lambda x: -1000 if x[1].action.parent_index != -1 else x[1].predict_state.ball_position.x)
+        
+        logger.error(f"Best action: {best_action[0]} {best_action[1].action.description} to {best_action[1].action.target_unum} in ({round(best_action[1].action.target_point.x, 2)},{round(best_action[1].action.target_point.y, 2)}) e:{round(best_action[1].evaluation,2)}")
+        
+        res = pb2.BestPlannerActionResponse(index=best_action[0])
         return res
 
 def serve(port, shared_lock, shared_number_of_connections):
