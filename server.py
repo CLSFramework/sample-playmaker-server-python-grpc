@@ -9,23 +9,7 @@ import grpc
 import argparse
 
 
-logging.basicConfig(level=logging.INFO)
-#put log into file as well as console
-# Create a custom logger
-logger = logging.getLogger('my_logger')
-logger.setLevel(logging.DEBUG)  # Set the minimum logging level
-
-# Create handlers: one for console, one for file
-console_handler = logging.StreamHandler()
-file_handler = logging.FileHandler('logfile.log')
-
-# Set logging level for each handler
-console_handler.setLevel(logging.ERROR)
-file_handler.setLevel(logging.INFO)
-
-# Add the handlers to the logger
-logger.addHandler(console_handler)
-logger.addHandler(file_handler)
+logging.basicConfig(level=logging.DEBUG)
 
 class GrpcAgent:
     def __init__(self, agent_type, uniform_number) -> None:
@@ -162,11 +146,11 @@ class GameHandler(pb2_grpc.GameServicer):
         return res
     
     def GetBestPlannerAction(self, pairs: pb2.BestPlannerActionRequest, context):
-        logger.debug(f"GetBestPlannerAction cycle:{pairs.state.world_model.cycle} pairs:{len(pairs.pairs)} unum:{pairs.state.register_response.uniform_number}")
+        logging.debug(f"GetBestPlannerAction cycle:{pairs.state.world_model.cycle} pairs:{len(pairs.pairs)} unum:{pairs.state.register_response.uniform_number}")
         pairs_list: list[int, pb2.RpcActionState] = [(k, v) for k, v in pairs.pairs.items()]
         pairs_list.sort(key=lambda x: x[0])
         best_action = max(pairs_list, key=lambda x: -1000 if x[1].action.parent_index != -1 else x[1].predict_state.ball_position.x)
-        logger.debug(f"Best action: {best_action[0]} {best_action[1].action.description} to {best_action[1].action.target_unum} in ({round(best_action[1].action.target_point.x, 2)},{round(best_action[1].action.target_point.y, 2)}) e:{round(best_action[1].evaluation,2)}")
+        logging.debug(f"Best action: {best_action[0]} {best_action[1].action.description} to {best_action[1].action.target_unum} in ({round(best_action[1].action.target_point.x, 2)},{round(best_action[1].action.target_point.y, 2)}) e:{round(best_action[1].evaluation,2)}")
         res = pb2.BestPlannerActionResponse(index=best_action[0])
         return res
 
