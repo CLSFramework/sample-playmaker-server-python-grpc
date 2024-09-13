@@ -45,6 +45,7 @@ class GrpcAgent:
                                                                                   cross=True,
                                                                                   server_side_decision=False
                                                                                   )))
+                actions.append(pb2.PlayerAction(helios_shoot=pb2.HeliosShoot()))
             else:
                 actions.append(pb2.PlayerAction(helios_basic_move=pb2.HeliosBasicMove()))
         else:
