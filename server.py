@@ -55,11 +55,12 @@ class GrpcAgent:
                                                                                   through_pass=True,
                                                                                   simple_pass=True,
                                                                                   short_dribble=True,
-                                                                                  long_dribble=False,
+                                                                                  long_dribble=True,
                                                                                   simple_shoot=True,
                                                                                   simple_dribble=True,
-                                                                                  server_side_decision=True,
-                                                                                  cross=True)))
+                                                                                  cross=True,
+                                                                                  server_side_decision=False
+                                                                                  )))
             else:
                 actions.append(pb2.PlayerAction(helios_basic_move=pb2.HeliosBasicMove()))
         else:
@@ -161,18 +162,11 @@ class GameHandler(pb2_grpc.GameServicer):
         return res
     
     def GetBestPlannerAction(self, pairs: pb2.BestPlannerActionRequest, context):
-        logger.error(f"GetBestPlannerAction cycle:{pairs.state.world_model.cycle} pairs:{len(pairs.pairs)} unum:{pairs.state.register_response.uniform_number}")
+        logger.debug(f"GetBestPlannerAction cycle:{pairs.state.world_model.cycle} pairs:{len(pairs.pairs)} unum:{pairs.state.register_response.uniform_number}")
         pairs_list: list[int, pb2.RpcActionState] = [(k, v) for k, v in pairs.pairs.items()]
         pairs_list.sort(key=lambda x: x[0])
-        
-        # for p in pairs_list:
-        #     pair: pb2.RpcActionStatePair = p[1]
-        #     logger.info(f"i:{p[0]} p:{pair.action.parent_index} {p[1].action.description} to {p[1].action.target_unum} in ({round(p[1].action.target_point.x, 2)},{round(p[1].action.target_point.y, 2)}) e:{round(p[1].evaluation,2)}")
-        
         best_action = max(pairs_list, key=lambda x: -1000 if x[1].action.parent_index != -1 else x[1].predict_state.ball_position.x)
-        
-        logger.error(f"Best action: {best_action[0]} {best_action[1].action.description} to {best_action[1].action.target_unum} in ({round(best_action[1].action.target_point.x, 2)},{round(best_action[1].action.target_point.y, 2)}) e:{round(best_action[1].evaluation,2)}")
-        
+        logger.debug(f"Best action: {best_action[0]} {best_action[1].action.description} to {best_action[1].action.target_unum} in ({round(best_action[1].action.target_point.x, 2)},{round(best_action[1].action.target_point.y, 2)}) e:{round(best_action[1].evaluation,2)}")
         res = pb2.BestPlannerActionResponse(index=best_action[0])
         return res
 
