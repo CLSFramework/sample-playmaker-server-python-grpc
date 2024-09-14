@@ -1,4 +1,4 @@
-// version 0
+// version 1
 
 syntax = "proto3";
 
@@ -83,6 +83,12 @@ enum LoggerLevel{
   // LEVEL_ANY = 0xffffffff;
 }
 
+enum CardType {
+  NO_CARD = 0;
+  YELLOW = 1;
+  RED = 2;
+}
+
 message Player {
   RpcVector2D  position = 1;
   RpcVector2D  seen_position = 2;
@@ -153,6 +159,9 @@ message Self {
   ViewWidth view_width = 34;
   int32 type_id = 35;
   float kick_rate = 36;
+  float recovery = 37;
+  float stamina_capacity = 38;
+  CardType card = 39;
 }
 
 enum InterceptActionType {
@@ -256,6 +265,10 @@ message WorldModel {
   int32 their_team_score = 29;
   bool is_penalty_kick_mode = 30;
   map<int32, RpcVector2D> helios_home_positions = 31;
+  double our_defense_line_x = 32;
+  double their_defense_line_x = 33;
+  double our_defense_player_line_x = 34;
+  double their_defense_player_line_x = 35;
 }
 
 message State {
@@ -750,7 +763,7 @@ message HeliosGoalieKick {}
 
 message HeliosShoot {}
 
-message HeliosChainAction {
+message HeliosOffensivePlanner {
   bool direct_pass = 1;
   bool lead_pass = 2;
   bool through_pass = 3;
@@ -833,7 +846,7 @@ message PlayerAction {
       HeliosGoalieMove helios_goalie_move = 56;
       HeliosGoalieKick helios_goalie_kick = 57;
       HeliosShoot helios_shoot = 58;
-      HeliosChainAction helios_chain_action = 59;
+      HeliosOffensivePlanner helios_offensive_planner = 59;
       HeliosBasicOffensive helios_basic_offensive = 60;
       HeliosBasicMove helios_basic_move = 61;
       HeliosSetPlay helios_set_play = 62;

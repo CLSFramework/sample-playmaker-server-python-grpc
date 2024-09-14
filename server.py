@@ -34,7 +34,7 @@ class GrpcAgent:
             if state.world_model.self.is_goalie:
                 actions.append(pb2.PlayerAction(helios_goalie=pb2.HeliosGoalie()))
             elif state.world_model.self.is_kickable:
-                actions.append(pb2.PlayerAction(helios_chain_action=pb2.HeliosChainAction(lead_pass=True,
+                actions.append(pb2.PlayerAction(helios_offensive_planner=pb2.HeliosOffensivePlanner(lead_pass=True,
                                                                                   direct_pass=True,
                                                                                   through_pass=True,
                                                                                   simple_pass=True,
