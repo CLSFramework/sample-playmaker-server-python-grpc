@@ -12,6 +12,17 @@ class ViewWidth(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     NORMAL: _ClassVar[ViewWidth]
     WIDE: _ClassVar[ViewWidth]
 
+class RpcServerLanguageType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    UNKNOWN_LANGUAGE: _ClassVar[RpcServerLanguageType]
+    PYThON: _ClassVar[RpcServerLanguageType]
+    JAVA: _ClassVar[RpcServerLanguageType]
+    CPP: _ClassVar[RpcServerLanguageType]
+    CSHARP: _ClassVar[RpcServerLanguageType]
+    RUBY: _ClassVar[RpcServerLanguageType]
+    JAVE_SCRIPT: _ClassVar[RpcServerLanguageType]
+    GO: _ClassVar[RpcServerLanguageType]
+
 class Side(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
     UNKNOWN: _ClassVar[Side]
@@ -42,6 +53,12 @@ class LoggerLevel(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     ANALYZER: _ClassVar[LoggerLevel]
     ACTION_CHAIN: _ClassVar[LoggerLevel]
     PLAN: _ClassVar[LoggerLevel]
+
+class CardType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    NO_CARD: _ClassVar[CardType]
+    YELLOW: _ClassVar[CardType]
+    RED: _ClassVar[CardType]
 
 class InterceptActionType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
@@ -91,9 +108,27 @@ class AgentType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     PlayerT: _ClassVar[AgentType]
     CoachT: _ClassVar[AgentType]
     TrainerT: _ClassVar[AgentType]
+
+class RpcActionCategory(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    AC_Hold: _ClassVar[RpcActionCategory]
+    AC_Dribble: _ClassVar[RpcActionCategory]
+    AC_Pass: _ClassVar[RpcActionCategory]
+    AC_Shoot: _ClassVar[RpcActionCategory]
+    AC_Clear: _ClassVar[RpcActionCategory]
+    AC_Move: _ClassVar[RpcActionCategory]
+    AC_NoAction: _ClassVar[RpcActionCategory]
 NARROW: ViewWidth
 NORMAL: ViewWidth
 WIDE: ViewWidth
+UNKNOWN_LANGUAGE: RpcServerLanguageType
+PYThON: RpcServerLanguageType
+JAVA: RpcServerLanguageType
+CPP: RpcServerLanguageType
+CSHARP: RpcServerLanguageType
+RUBY: RpcServerLanguageType
+JAVE_SCRIPT: RpcServerLanguageType
+GO: RpcServerLanguageType
 UNKNOWN: Side
 LEFT: Side
 RIGHT: Side
@@ -119,6 +154,9 @@ COMMUNICATION: LoggerLevel
 ANALYZER: LoggerLevel
 ACTION_CHAIN: LoggerLevel
 PLAN: LoggerLevel
+NO_CARD: CardType
+YELLOW: CardType
+RED: CardType
 UNKNOWN_Intercept_Action_Type: InterceptActionType
 OMNI_DASH: InterceptActionType
 TURN_FORWARD_DASH: InterceptActionType
@@ -159,6 +197,13 @@ MODE_MAX: GameModeType
 PlayerT: AgentType
 CoachT: AgentType
 TrainerT: AgentType
+AC_Hold: RpcActionCategory
+AC_Dribble: RpcActionCategory
+AC_Pass: RpcActionCategory
+AC_Shoot: RpcActionCategory
+AC_Clear: RpcActionCategory
+AC_Move: RpcActionCategory
+AC_NoAction: RpcActionCategory
 
 class RpcVector2D(_message.Message):
     __slots__ = ("x", "y", "dist", "angle")
@@ -173,26 +218,30 @@ class RpcVector2D(_message.Message):
     def __init__(self, x: _Optional[float] = ..., y: _Optional[float] = ..., dist: _Optional[float] = ..., angle: _Optional[float] = ...) -> None: ...
 
 class RegisterRequest(_message.Message):
-    __slots__ = ("agent_type", "team_name", "uniform_number")
+    __slots__ = ("agent_type", "team_name", "uniform_number", "rpc_version")
     AGENT_TYPE_FIELD_NUMBER: _ClassVar[int]
     TEAM_NAME_FIELD_NUMBER: _ClassVar[int]
     UNIFORM_NUMBER_FIELD_NUMBER: _ClassVar[int]
+    RPC_VERSION_FIELD_NUMBER: _ClassVar[int]
     agent_type: AgentType
     team_name: str
     uniform_number: int
-    def __init__(self, agent_type: _Optional[_Union[AgentType, str]] = ..., team_name: _Optional[str] = ..., uniform_number: _Optional[int] = ...) -> None: ...
+    rpc_version: int
+    def __init__(self, agent_type: _Optional[_Union[AgentType, str]] = ..., team_name: _Optional[str] = ..., uniform_number: _Optional[int] = ..., rpc_version: _Optional[int] = ...) -> None: ...
 
 class RegisterResponse(_message.Message):
-    __slots__ = ("client_id", "agent_type", "team_name", "uniform_number")
+    __slots__ = ("client_id", "agent_type", "team_name", "uniform_number", "rpc_server_language_type")
     CLIENT_ID_FIELD_NUMBER: _ClassVar[int]
     AGENT_TYPE_FIELD_NUMBER: _ClassVar[int]
     TEAM_NAME_FIELD_NUMBER: _ClassVar[int]
     UNIFORM_NUMBER_FIELD_NUMBER: _ClassVar[int]
+    RPC_SERVER_LANGUAGE_TYPE_FIELD_NUMBER: _ClassVar[int]
     client_id: int
     agent_type: AgentType
     team_name: str
     uniform_number: int
-    def __init__(self, client_id: _Optional[int] = ..., agent_type: _Optional[_Union[AgentType, str]] = ..., team_name: _Optional[str] = ..., uniform_number: _Optional[int] = ...) -> None: ...
+    rpc_server_language_type: RpcServerLanguageType
+    def __init__(self, client_id: _Optional[int] = ..., agent_type: _Optional[_Union[AgentType, str]] = ..., team_name: _Optional[str] = ..., uniform_number: _Optional[int] = ..., rpc_server_language_type: _Optional[_Union[RpcServerLanguageType, str]] = ...) -> None: ...
 
 class Ball(_message.Message):
     __slots__ = ("position", "relative_position", "seen_position", "heard_position", "velocity", "seen_velocity", "heard_velocity", "pos_count", "seen_pos_count", "heard_pos_count", "vel_count", "seen_vel_count", "heard_vel_count", "lost_count", "ghost_count", "dist_from_self", "angle_from_self")
@@ -297,7 +346,7 @@ class Player(_message.Message):
     def __init__(self, position: _Optional[_Union[RpcVector2D, _Mapping]] = ..., seen_position: _Optional[_Union[RpcVector2D, _Mapping]] = ..., heard_position: _Optional[_Union[RpcVector2D, _Mapping]] = ..., velocity: _Optional[_Union[RpcVector2D, _Mapping]] = ..., seen_velocity: _Optional[_Union[RpcVector2D, _Mapping]] = ..., pos_count: _Optional[int] = ..., seen_pos_count: _Optional[int] = ..., heard_pos_count: _Optional[int] = ..., vel_count: _Optional[int] = ..., seen_vel_count: _Optional[int] = ..., ghost_count: _Optional[int] = ..., dist_from_self: _Optional[float] = ..., angle_from_self: _Optional[float] = ..., id: _Optional[int] = ..., side: _Optional[_Union[Side, str]] = ..., uniform_number: _Optional[int] = ..., uniform_number_count: _Optional[int] = ..., is_goalie: bool = ..., body_direction: _Optional[float] = ..., body_direction_count: _Optional[int] = ..., face_direction: _Optional[float] = ..., face_direction_count: _Optional[int] = ..., point_to_direction: _Optional[float] = ..., point_to_direction_count: _Optional[int] = ..., is_kicking: bool = ..., dist_from_ball: _Optional[float] = ..., angle_from_ball: _Optional[float] = ..., ball_reach_steps: _Optional[int] = ..., is_tackling: bool = ..., type_id: _Optional[int] = ...) -> None: ...
 
 class Self(_message.Message):
-    __slots__ = ("position", "seen_position", "heard_position", "velocity", "seen_velocity", "pos_count", "seen_pos_count", "heard_pos_count", "vel_count", "seen_vel_count", "ghost_count", "id", "side", "uniform_number", "uniform_number_count", "is_goalie", "body_direction", "body_direction_count", "face_direction", "face_direction_count", "point_to_direction", "point_to_direction_count", "is_kicking", "dist_from_ball", "angle_from_ball", "ball_reach_steps", "is_tackling", "relative_neck_direction", "stamina", "is_kickable", "catch_probability", "tackle_probability", "foul_probability", "view_width", "type_id", "kick_rate")
+    __slots__ = ("position", "seen_position", "heard_position", "velocity", "seen_velocity", "pos_count", "seen_pos_count", "heard_pos_count", "vel_count", "seen_vel_count", "ghost_count", "id", "side", "uniform_number", "uniform_number_count", "is_goalie", "body_direction", "body_direction_count", "face_direction", "face_direction_count", "point_to_direction", "point_to_direction_count", "is_kicking", "dist_from_ball", "angle_from_ball", "ball_reach_steps", "is_tackling", "relative_neck_direction", "stamina", "is_kickable", "catch_probability", "tackle_probability", "foul_probability", "view_width", "type_id", "kick_rate", "recovery", "stamina_capacity", "card")
     POSITION_FIELD_NUMBER: _ClassVar[int]
     SEEN_POSITION_FIELD_NUMBER: _ClassVar[int]
     HEARD_POSITION_FIELD_NUMBER: _ClassVar[int]
@@ -334,6 +383,9 @@ class Self(_message.Message):
     VIEW_WIDTH_FIELD_NUMBER: _ClassVar[int]
     TYPE_ID_FIELD_NUMBER: _ClassVar[int]
     KICK_RATE_FIELD_NUMBER: _ClassVar[int]
+    RECOVERY_FIELD_NUMBER: _ClassVar[int]
+    STAMINA_CAPACITY_FIELD_NUMBER: _ClassVar[int]
+    CARD_FIELD_NUMBER: _ClassVar[int]
     position: RpcVector2D
     seen_position: RpcVector2D
     heard_position: RpcVector2D
@@ -370,7 +422,10 @@ class Self(_message.Message):
     view_width: ViewWidth
     type_id: int
     kick_rate: float
-    def __init__(self, position: _Optional[_Union[RpcVector2D, _Mapping]] = ..., seen_position: _Optional[_Union[RpcVector2D, _Mapping]] = ..., heard_position: _Optional[_Union[RpcVector2D, _Mapping]] = ..., velocity: _Optional[_Union[RpcVector2D, _Mapping]] = ..., seen_velocity: _Optional[_Union[RpcVector2D, _Mapping]] = ..., pos_count: _Optional[int] = ..., seen_pos_count: _Optional[int] = ..., heard_pos_count: _Optional[int] = ..., vel_count: _Optional[int] = ..., seen_vel_count: _Optional[int] = ..., ghost_count: _Optional[int] = ..., id: _Optional[int] = ..., side: _Optional[_Union[Side, str]] = ..., uniform_number: _Optional[int] = ..., uniform_number_count: _Optional[int] = ..., is_goalie: bool = ..., body_direction: _Optional[float] = ..., body_direction_count: _Optional[int] = ..., face_direction: _Optional[float] = ..., face_direction_count: _Optional[int] = ..., point_to_direction: _Optional[float] = ..., point_to_direction_count: _Optional[int] = ..., is_kicking: bool = ..., dist_from_ball: _Optional[float] = ..., angle_from_ball: _Optional[float] = ..., ball_reach_steps: _Optional[int] = ..., is_tackling: bool = ..., relative_neck_direction: _Optional[float] = ..., stamina: _Optional[float] = ..., is_kickable: bool = ..., catch_probability: _Optional[float] = ..., tackle_probability: _Optional[float] = ..., foul_probability: _Optional[float] = ..., view_width: _Optional[_Union[ViewWidth, str]] = ..., type_id: _Optional[int] = ..., kick_rate: _Optional[float] = ...) -> None: ...
+    recovery: float
+    stamina_capacity: float
+    card: CardType
+    def __init__(self, position: _Optional[_Union[RpcVector2D, _Mapping]] = ..., seen_position: _Optional[_Union[RpcVector2D, _Mapping]] = ..., heard_position: _Optional[_Union[RpcVector2D, _Mapping]] = ..., velocity: _Optional[_Union[RpcVector2D, _Mapping]] = ..., seen_velocity: _Optional[_Union[RpcVector2D, _Mapping]] = ..., pos_count: _Optional[int] = ..., seen_pos_count: _Optional[int] = ..., heard_pos_count: _Optional[int] = ..., vel_count: _Optional[int] = ..., seen_vel_count: _Optional[int] = ..., ghost_count: _Optional[int] = ..., id: _Optional[int] = ..., side: _Optional[_Union[Side, str]] = ..., uniform_number: _Optional[int] = ..., uniform_number_count: _Optional[int] = ..., is_goalie: bool = ..., body_direction: _Optional[float] = ..., body_direction_count: _Optional[int] = ..., face_direction: _Optional[float] = ..., face_direction_count: _Optional[int] = ..., point_to_direction: _Optional[float] = ..., point_to_direction_count: _Optional[int] = ..., is_kicking: bool = ..., dist_from_ball: _Optional[float] = ..., angle_from_ball: _Optional[float] = ..., ball_reach_steps: _Optional[int] = ..., is_tackling: bool = ..., relative_neck_direction: _Optional[float] = ..., stamina: _Optional[float] = ..., is_kickable: bool = ..., catch_probability: _Optional[float] = ..., tackle_probability: _Optional[float] = ..., foul_probability: _Optional[float] = ..., view_width: _Optional[_Union[ViewWidth, str]] = ..., type_id: _Optional[int] = ..., kick_rate: _Optional[float] = ..., recovery: _Optional[float] = ..., stamina_capacity: _Optional[float] = ..., card: _Optional[_Union[CardType, str]] = ...) -> None: ...
 
 class InterceptInfo(_message.Message):
     __slots__ = ("action_type", "turn_steps", "turn_angle", "dash_steps", "dash_power", "dash_dir", "final_self_position", "final_ball_dist", "final_stamina", "value")
@@ -421,7 +476,7 @@ class InterceptTable(_message.Message):
     def __init__(self, self_reach_steps: _Optional[int] = ..., first_teammate_reach_steps: _Optional[int] = ..., second_teammate_reach_steps: _Optional[int] = ..., first_opponent_reach_steps: _Optional[int] = ..., second_opponent_reach_steps: _Optional[int] = ..., first_teammate_id: _Optional[int] = ..., second_teammate_id: _Optional[int] = ..., first_opponent_id: _Optional[int] = ..., second_opponent_id: _Optional[int] = ..., self_intercept_info: _Optional[_Iterable[_Union[InterceptInfo, _Mapping]]] = ...) -> None: ...
 
 class WorldModel(_message.Message):
-    __slots__ = ("intercept_table", "our_team_name", "their_team_name", "our_side", "last_set_play_start_time", "self", "ball", "teammates", "opponents", "unknowns", "our_players_dict", "their_players_dict", "our_goalie_uniform_number", "their_goalie_uniform_number", "offside_line_x", "ofside_line_x_count", "kickable_teammate_id", "kickable_opponent_id", "last_kick_side", "last_kicker_uniform_number", "cycle", "game_mode_type", "left_team_score", "right_team_score", "is_our_set_play", "is_their_set_play", "stoped_cycle", "our_team_score", "their_team_score", "is_penalty_kick_mode", "helios_home_positions")
+    __slots__ = ("intercept_table", "our_team_name", "their_team_name", "our_side", "last_set_play_start_time", "self", "ball", "teammates", "opponents", "unknowns", "our_players_dict", "their_players_dict", "our_goalie_uniform_number", "their_goalie_uniform_number", "offside_line_x", "ofside_line_x_count", "kickable_teammate_id", "kickable_opponent_id", "last_kick_side", "last_kicker_uniform_number", "cycle", "game_mode_type", "left_team_score", "right_team_score", "is_our_set_play", "is_their_set_play", "stoped_cycle", "our_team_score", "their_team_score", "is_penalty_kick_mode", "helios_home_positions", "our_defense_line_x", "their_defense_line_x", "our_defense_player_line_x", "their_defense_player_line_x")
     class OurPlayersDictEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -474,6 +529,10 @@ class WorldModel(_message.Message):
     THEIR_TEAM_SCORE_FIELD_NUMBER: _ClassVar[int]
     IS_PENALTY_KICK_MODE_FIELD_NUMBER: _ClassVar[int]
     HELIOS_HOME_POSITIONS_FIELD_NUMBER: _ClassVar[int]
+    OUR_DEFENSE_LINE_X_FIELD_NUMBER: _ClassVar[int]
+    THEIR_DEFENSE_LINE_X_FIELD_NUMBER: _ClassVar[int]
+    OUR_DEFENSE_PLAYER_LINE_X_FIELD_NUMBER: _ClassVar[int]
+    THEIR_DEFENSE_PLAYER_LINE_X_FIELD_NUMBER: _ClassVar[int]
     intercept_table: InterceptTable
     our_team_name: str
     their_team_name: str
@@ -505,7 +564,11 @@ class WorldModel(_message.Message):
     their_team_score: int
     is_penalty_kick_mode: bool
     helios_home_positions: _containers.MessageMap[int, RpcVector2D]
-    def __init__(self, intercept_table: _Optional[_Union[InterceptTable, _Mapping]] = ..., our_team_name: _Optional[str] = ..., their_team_name: _Optional[str] = ..., our_side: _Optional[_Union[Side, str]] = ..., last_set_play_start_time: _Optional[int] = ..., self: _Optional[_Union[Self, _Mapping]] = ..., ball: _Optional[_Union[Ball, _Mapping]] = ..., teammates: _Optional[_Iterable[_Union[Player, _Mapping]]] = ..., opponents: _Optional[_Iterable[_Union[Player, _Mapping]]] = ..., unknowns: _Optional[_Iterable[_Union[Player, _Mapping]]] = ..., our_players_dict: _Optional[_Mapping[int, Player]] = ..., their_players_dict: _Optional[_Mapping[int, Player]] = ..., our_goalie_uniform_number: _Optional[int] = ..., their_goalie_uniform_number: _Optional[int] = ..., offside_line_x: _Optional[float] = ..., ofside_line_x_count: _Optional[int] = ..., kickable_teammate_id: _Optional[int] = ..., kickable_opponent_id: _Optional[int] = ..., last_kick_side: _Optional[_Union[Side, str]] = ..., last_kicker_uniform_number: _Optional[int] = ..., cycle: _Optional[int] = ..., game_mode_type: _Optional[_Union[GameModeType, str]] = ..., left_team_score: _Optional[int] = ..., right_team_score: _Optional[int] = ..., is_our_set_play: bool = ..., is_their_set_play: bool = ..., stoped_cycle: _Optional[int] = ..., our_team_score: _Optional[int] = ..., their_team_score: _Optional[int] = ..., is_penalty_kick_mode: bool = ..., helios_home_positions: _Optional[_Mapping[int, RpcVector2D]] = ...) -> None: ...
+    our_defense_line_x: float
+    their_defense_line_x: float
+    our_defense_player_line_x: float
+    their_defense_player_line_x: float
+    def __init__(self, intercept_table: _Optional[_Union[InterceptTable, _Mapping]] = ..., our_team_name: _Optional[str] = ..., their_team_name: _Optional[str] = ..., our_side: _Optional[_Union[Side, str]] = ..., last_set_play_start_time: _Optional[int] = ..., self: _Optional[_Union[Self, _Mapping]] = ..., ball: _Optional[_Union[Ball, _Mapping]] = ..., teammates: _Optional[_Iterable[_Union[Player, _Mapping]]] = ..., opponents: _Optional[_Iterable[_Union[Player, _Mapping]]] = ..., unknowns: _Optional[_Iterable[_Union[Player, _Mapping]]] = ..., our_players_dict: _Optional[_Mapping[int, Player]] = ..., their_players_dict: _Optional[_Mapping[int, Player]] = ..., our_goalie_uniform_number: _Optional[int] = ..., their_goalie_uniform_number: _Optional[int] = ..., offside_line_x: _Optional[float] = ..., ofside_line_x_count: _Optional[int] = ..., kickable_teammate_id: _Optional[int] = ..., kickable_opponent_id: _Optional[int] = ..., last_kick_side: _Optional[_Union[Side, str]] = ..., last_kicker_uniform_number: _Optional[int] = ..., cycle: _Optional[int] = ..., game_mode_type: _Optional[_Union[GameModeType, str]] = ..., left_team_score: _Optional[int] = ..., right_team_score: _Optional[int] = ..., is_our_set_play: bool = ..., is_their_set_play: bool = ..., stoped_cycle: _Optional[int] = ..., our_team_score: _Optional[int] = ..., their_team_score: _Optional[int] = ..., is_penalty_kick_mode: bool = ..., helios_home_positions: _Optional[_Mapping[int, RpcVector2D]] = ..., our_defense_line_x: _Optional[float] = ..., their_defense_line_x: _Optional[float] = ..., our_defense_player_line_x: _Optional[float] = ..., their_defense_player_line_x: _Optional[float] = ...) -> None: ...
 
 class State(_message.Message):
     __slots__ = ("register_response", "world_model", "full_world_model", "need_preprocess")
@@ -1279,8 +1342,8 @@ class HeliosShoot(_message.Message):
     __slots__ = ()
     def __init__(self) -> None: ...
 
-class HeliosChainAction(_message.Message):
-    __slots__ = ("direct_pass", "lead_pass", "through_pass", "short_dribble", "long_dribble", "cross", "simple_pass", "simple_dribble", "simple_shoot")
+class HeliosOffensivePlanner(_message.Message):
+    __slots__ = ("direct_pass", "lead_pass", "through_pass", "short_dribble", "long_dribble", "cross", "simple_pass", "simple_dribble", "simple_shoot", "server_side_decision")
     DIRECT_PASS_FIELD_NUMBER: _ClassVar[int]
     LEAD_PASS_FIELD_NUMBER: _ClassVar[int]
     THROUGH_PASS_FIELD_NUMBER: _ClassVar[int]
@@ -1290,6 +1353,7 @@ class HeliosChainAction(_message.Message):
     SIMPLE_PASS_FIELD_NUMBER: _ClassVar[int]
     SIMPLE_DRIBBLE_FIELD_NUMBER: _ClassVar[int]
     SIMPLE_SHOOT_FIELD_NUMBER: _ClassVar[int]
+    SERVER_SIDE_DECISION_FIELD_NUMBER: _ClassVar[int]
     direct_pass: bool
     lead_pass: bool
     through_pass: bool
@@ -1299,7 +1363,8 @@ class HeliosChainAction(_message.Message):
     simple_pass: bool
     simple_dribble: bool
     simple_shoot: bool
-    def __init__(self, direct_pass: bool = ..., lead_pass: bool = ..., through_pass: bool = ..., short_dribble: bool = ..., long_dribble: bool = ..., cross: bool = ..., simple_pass: bool = ..., simple_dribble: bool = ..., simple_shoot: bool = ...) -> None: ...
+    server_side_decision: bool
+    def __init__(self, direct_pass: bool = ..., lead_pass: bool = ..., through_pass: bool = ..., short_dribble: bool = ..., long_dribble: bool = ..., cross: bool = ..., simple_pass: bool = ..., simple_dribble: bool = ..., simple_shoot: bool = ..., server_side_decision: bool = ...) -> None: ...
 
 class HeliosBasicOffensive(_message.Message):
     __slots__ = ()
@@ -1322,7 +1387,7 @@ class HeliosCommunicaion(_message.Message):
     def __init__(self) -> None: ...
 
 class PlayerAction(_message.Message):
-    __slots__ = ("dash", "turn", "kick", "tackle", "catch", "move", "turn_neck", "change_view", "say", "point_to", "point_to_of", "attention_to", "attention_to_of", "log", "debug_client", "body_go_to_point", "body_smart_kick", "bhv_before_kick_off", "bhv_body_neck_to_ball", "bhv_body_neck_to_point", "bhv_emergency", "bhv_go_to_point_look_ball", "bhv_neck_body_to_ball", "bhv_neck_body_to_point", "bhv_scan_field", "body_advance_ball", "body_clear_ball", "body_dribble", "body_go_to_point_dodge", "body_hold_ball", "body_intercept", "body_kick_one_step", "body_stop_ball", "body_stop_dash", "body_tackle_to_point", "body_turn_to_angle", "body_turn_to_ball", "body_turn_to_point", "focus_move_to_point", "focus_reset", "neck_scan_field", "neck_scan_players", "neck_turn_to_ball_and_player", "neck_turn_to_ball_or_scan", "neck_turn_to_ball", "neck_turn_to_goalie_or_scan", "neck_turn_to_low_conf_teammate", "neck_turn_to_player_or_scan", "neck_turn_to_point", "neck_turn_to_relative", "view_change_width", "view_normal", "view_synch", "view_wide", "helios_goalie", "helios_goalie_move", "helios_goalie_kick", "helios_shoot", "helios_chain_action", "helios_basic_offensive", "helios_basic_move", "helios_set_play", "helios_penalty", "helios_communication")
+    __slots__ = ("dash", "turn", "kick", "tackle", "catch", "move", "turn_neck", "change_view", "say", "point_to", "point_to_of", "attention_to", "attention_to_of", "log", "debug_client", "body_go_to_point", "body_smart_kick", "bhv_before_kick_off", "bhv_body_neck_to_ball", "bhv_body_neck_to_point", "bhv_emergency", "bhv_go_to_point_look_ball", "bhv_neck_body_to_ball", "bhv_neck_body_to_point", "bhv_scan_field", "body_advance_ball", "body_clear_ball", "body_dribble", "body_go_to_point_dodge", "body_hold_ball", "body_intercept", "body_kick_one_step", "body_stop_ball", "body_stop_dash", "body_tackle_to_point", "body_turn_to_angle", "body_turn_to_ball", "body_turn_to_point", "focus_move_to_point", "focus_reset", "neck_scan_field", "neck_scan_players", "neck_turn_to_ball_and_player", "neck_turn_to_ball_or_scan", "neck_turn_to_ball", "neck_turn_to_goalie_or_scan", "neck_turn_to_low_conf_teammate", "neck_turn_to_player_or_scan", "neck_turn_to_point", "neck_turn_to_relative", "view_change_width", "view_normal", "view_synch", "view_wide", "helios_goalie", "helios_goalie_move", "helios_goalie_kick", "helios_shoot", "helios_offensive_planner", "helios_basic_offensive", "helios_basic_move", "helios_set_play", "helios_penalty", "helios_communication")
     DASH_FIELD_NUMBER: _ClassVar[int]
     TURN_FIELD_NUMBER: _ClassVar[int]
     KICK_FIELD_NUMBER: _ClassVar[int]
@@ -1381,7 +1446,7 @@ class PlayerAction(_message.Message):
     HELIOS_GOALIE_MOVE_FIELD_NUMBER: _ClassVar[int]
     HELIOS_GOALIE_KICK_FIELD_NUMBER: _ClassVar[int]
     HELIOS_SHOOT_FIELD_NUMBER: _ClassVar[int]
-    HELIOS_CHAIN_ACTION_FIELD_NUMBER: _ClassVar[int]
+    HELIOS_OFFENSIVE_PLANNER_FIELD_NUMBER: _ClassVar[int]
     HELIOS_BASIC_OFFENSIVE_FIELD_NUMBER: _ClassVar[int]
     HELIOS_BASIC_MOVE_FIELD_NUMBER: _ClassVar[int]
     HELIOS_SET_PLAY_FIELD_NUMBER: _ClassVar[int]
@@ -1445,13 +1510,13 @@ class PlayerAction(_message.Message):
     helios_goalie_move: HeliosGoalieMove
     helios_goalie_kick: HeliosGoalieKick
     helios_shoot: HeliosShoot
-    helios_chain_action: HeliosChainAction
+    helios_offensive_planner: HeliosOffensivePlanner
     helios_basic_offensive: HeliosBasicOffensive
     helios_basic_move: HeliosBasicMove
     helios_set_play: HeliosSetPlay
     helios_penalty: HeliosPenalty
     helios_communication: HeliosCommunicaion
-    def __init__(self, dash: _Optional[_Union[Dash, _Mapping]] = ..., turn: _Optional[_Union[Turn, _Mapping]] = ..., kick: _Optional[_Union[Kick, _Mapping]] = ..., tackle: _Optional[_Union[Tackle, _Mapping]] = ..., catch: _Optional[_Union[Catch, _Mapping]] = ..., move: _Optional[_Union[Move, _Mapping]] = ..., turn_neck: _Optional[_Union[TurnNeck, _Mapping]] = ..., change_view: _Optional[_Union[ChangeView, _Mapping]] = ..., say: _Optional[_Union[Say, _Mapping]] = ..., point_to: _Optional[_Union[PointTo, _Mapping]] = ..., point_to_of: _Optional[_Union[PointToOf, _Mapping]] = ..., attention_to: _Optional[_Union[AttentionTo, _Mapping]] = ..., attention_to_of: _Optional[_Union[AttentionToOf, _Mapping]] = ..., log: _Optional[_Union[Log, _Mapping]] = ..., debug_client: _Optional[_Union[DebugClient, _Mapping]] = ..., body_go_to_point: _Optional[_Union[Body_GoToPoint, _Mapping]] = ..., body_smart_kick: _Optional[_Union[Body_SmartKick, _Mapping]] = ..., bhv_before_kick_off: _Optional[_Union[Bhv_BeforeKickOff, _Mapping]] = ..., bhv_body_neck_to_ball: _Optional[_Union[Bhv_BodyNeckToBall, _Mapping]] = ..., bhv_body_neck_to_point: _Optional[_Union[Bhv_BodyNeckToPoint, _Mapping]] = ..., bhv_emergency: _Optional[_Union[Bhv_Emergency, _Mapping]] = ..., bhv_go_to_point_look_ball: _Optional[_Union[Bhv_GoToPointLookBall, _Mapping]] = ..., bhv_neck_body_to_ball: _Optional[_Union[Bhv_NeckBodyToBall, _Mapping]] = ..., bhv_neck_body_to_point: _Optional[_Union[Bhv_NeckBodyToPoint, _Mapping]] = ..., bhv_scan_field: _Optional[_Union[Bhv_ScanField, _Mapping]] = ..., body_advance_ball: _Optional[_Union[Body_AdvanceBall, _Mapping]] = ..., body_clear_ball: _Optional[_Union[Body_ClearBall, _Mapping]] = ..., body_dribble: _Optional[_Union[Body_Dribble, _Mapping]] = ..., body_go_to_point_dodge: _Optional[_Union[Body_GoToPointDodge, _Mapping]] = ..., body_hold_ball: _Optional[_Union[Body_HoldBall, _Mapping]] = ..., body_intercept: _Optional[_Union[Body_Intercept, _Mapping]] = ..., body_kick_one_step: _Optional[_Union[Body_KickOneStep, _Mapping]] = ..., body_stop_ball: _Optional[_Union[Body_StopBall, _Mapping]] = ..., body_stop_dash: _Optional[_Union[Body_StopDash, _Mapping]] = ..., body_tackle_to_point: _Optional[_Union[Body_TackleToPoint, _Mapping]] = ..., body_turn_to_angle: _Optional[_Union[Body_TurnToAngle, _Mapping]] = ..., body_turn_to_ball: _Optional[_Union[Body_TurnToBall, _Mapping]] = ..., body_turn_to_point: _Optional[_Union[Body_TurnToPoint, _Mapping]] = ..., focus_move_to_point: _Optional[_Union[Focus_MoveToPoint, _Mapping]] = ..., focus_reset: _Optional[_Union[Focus_Reset, _Mapping]] = ..., neck_scan_field: _Optional[_Union[Neck_ScanField, _Mapping]] = ..., neck_scan_players: _Optional[_Union[Neck_ScanPlayers, _Mapping]] = ..., neck_turn_to_ball_and_player: _Optional[_Union[Neck_TurnToBallAndPlayer, _Mapping]] = ..., neck_turn_to_ball_or_scan: _Optional[_Union[Neck_TurnToBallOrScan, _Mapping]] = ..., neck_turn_to_ball: _Optional[_Union[Neck_TurnToBall, _Mapping]] = ..., neck_turn_to_goalie_or_scan: _Optional[_Union[Neck_TurnToGoalieOrScan, _Mapping]] = ..., neck_turn_to_low_conf_teammate: _Optional[_Union[Neck_TurnToLowConfTeammate, _Mapping]] = ..., neck_turn_to_player_or_scan: _Optional[_Union[Neck_TurnToPlayerOrScan, _Mapping]] = ..., neck_turn_to_point: _Optional[_Union[Neck_TurnToPoint, _Mapping]] = ..., neck_turn_to_relative: _Optional[_Union[Neck_TurnToRelative, _Mapping]] = ..., view_change_width: _Optional[_Union[View_ChangeWidth, _Mapping]] = ..., view_normal: _Optional[_Union[View_Normal, _Mapping]] = ..., view_synch: _Optional[_Union[View_Synch, _Mapping]] = ..., view_wide: _Optional[_Union[View_Wide, _Mapping]] = ..., helios_goalie: _Optional[_Union[HeliosGoalie, _Mapping]] = ..., helios_goalie_move: _Optional[_Union[HeliosGoalieMove, _Mapping]] = ..., helios_goalie_kick: _Optional[_Union[HeliosGoalieKick, _Mapping]] = ..., helios_shoot: _Optional[_Union[HeliosShoot, _Mapping]] = ..., helios_chain_action: _Optional[_Union[HeliosChainAction, _Mapping]] = ..., helios_basic_offensive: _Optional[_Union[HeliosBasicOffensive, _Mapping]] = ..., helios_basic_move: _Optional[_Union[HeliosBasicMove, _Mapping]] = ..., helios_set_play: _Optional[_Union[HeliosSetPlay, _Mapping]] = ..., helios_penalty: _Optional[_Union[HeliosPenalty, _Mapping]] = ..., helios_communication: _Optional[_Union[HeliosCommunicaion, _Mapping]] = ...) -> None: ...
+    def __init__(self, dash: _Optional[_Union[Dash, _Mapping]] = ..., turn: _Optional[_Union[Turn, _Mapping]] = ..., kick: _Optional[_Union[Kick, _Mapping]] = ..., tackle: _Optional[_Union[Tackle, _Mapping]] = ..., catch: _Optional[_Union[Catch, _Mapping]] = ..., move: _Optional[_Union[Move, _Mapping]] = ..., turn_neck: _Optional[_Union[TurnNeck, _Mapping]] = ..., change_view: _Optional[_Union[ChangeView, _Mapping]] = ..., say: _Optional[_Union[Say, _Mapping]] = ..., point_to: _Optional[_Union[PointTo, _Mapping]] = ..., point_to_of: _Optional[_Union[PointToOf, _Mapping]] = ..., attention_to: _Optional[_Union[AttentionTo, _Mapping]] = ..., attention_to_of: _Optional[_Union[AttentionToOf, _Mapping]] = ..., log: _Optional[_Union[Log, _Mapping]] = ..., debug_client: _Optional[_Union[DebugClient, _Mapping]] = ..., body_go_to_point: _Optional[_Union[Body_GoToPoint, _Mapping]] = ..., body_smart_kick: _Optional[_Union[Body_SmartKick, _Mapping]] = ..., bhv_before_kick_off: _Optional[_Union[Bhv_BeforeKickOff, _Mapping]] = ..., bhv_body_neck_to_ball: _Optional[_Union[Bhv_BodyNeckToBall, _Mapping]] = ..., bhv_body_neck_to_point: _Optional[_Union[Bhv_BodyNeckToPoint, _Mapping]] = ..., bhv_emergency: _Optional[_Union[Bhv_Emergency, _Mapping]] = ..., bhv_go_to_point_look_ball: _Optional[_Union[Bhv_GoToPointLookBall, _Mapping]] = ..., bhv_neck_body_to_ball: _Optional[_Union[Bhv_NeckBodyToBall, _Mapping]] = ..., bhv_neck_body_to_point: _Optional[_Union[Bhv_NeckBodyToPoint, _Mapping]] = ..., bhv_scan_field: _Optional[_Union[Bhv_ScanField, _Mapping]] = ..., body_advance_ball: _Optional[_Union[Body_AdvanceBall, _Mapping]] = ..., body_clear_ball: _Optional[_Union[Body_ClearBall, _Mapping]] = ..., body_dribble: _Optional[_Union[Body_Dribble, _Mapping]] = ..., body_go_to_point_dodge: _Optional[_Union[Body_GoToPointDodge, _Mapping]] = ..., body_hold_ball: _Optional[_Union[Body_HoldBall, _Mapping]] = ..., body_intercept: _Optional[_Union[Body_Intercept, _Mapping]] = ..., body_kick_one_step: _Optional[_Union[Body_KickOneStep, _Mapping]] = ..., body_stop_ball: _Optional[_Union[Body_StopBall, _Mapping]] = ..., body_stop_dash: _Optional[_Union[Body_StopDash, _Mapping]] = ..., body_tackle_to_point: _Optional[_Union[Body_TackleToPoint, _Mapping]] = ..., body_turn_to_angle: _Optional[_Union[Body_TurnToAngle, _Mapping]] = ..., body_turn_to_ball: _Optional[_Union[Body_TurnToBall, _Mapping]] = ..., body_turn_to_point: _Optional[_Union[Body_TurnToPoint, _Mapping]] = ..., focus_move_to_point: _Optional[_Union[Focus_MoveToPoint, _Mapping]] = ..., focus_reset: _Optional[_Union[Focus_Reset, _Mapping]] = ..., neck_scan_field: _Optional[_Union[Neck_ScanField, _Mapping]] = ..., neck_scan_players: _Optional[_Union[Neck_ScanPlayers, _Mapping]] = ..., neck_turn_to_ball_and_player: _Optional[_Union[Neck_TurnToBallAndPlayer, _Mapping]] = ..., neck_turn_to_ball_or_scan: _Optional[_Union[Neck_TurnToBallOrScan, _Mapping]] = ..., neck_turn_to_ball: _Optional[_Union[Neck_TurnToBall, _Mapping]] = ..., neck_turn_to_goalie_or_scan: _Optional[_Union[Neck_TurnToGoalieOrScan, _Mapping]] = ..., neck_turn_to_low_conf_teammate: _Optional[_Union[Neck_TurnToLowConfTeammate, _Mapping]] = ..., neck_turn_to_player_or_scan: _Optional[_Union[Neck_TurnToPlayerOrScan, _Mapping]] = ..., neck_turn_to_point: _Optional[_Union[Neck_TurnToPoint, _Mapping]] = ..., neck_turn_to_relative: _Optional[_Union[Neck_TurnToRelative, _Mapping]] = ..., view_change_width: _Optional[_Union[View_ChangeWidth, _Mapping]] = ..., view_normal: _Optional[_Union[View_Normal, _Mapping]] = ..., view_synch: _Optional[_Union[View_Synch, _Mapping]] = ..., view_wide: _Optional[_Union[View_Wide, _Mapping]] = ..., helios_goalie: _Optional[_Union[HeliosGoalie, _Mapping]] = ..., helios_goalie_move: _Optional[_Union[HeliosGoalieMove, _Mapping]] = ..., helios_goalie_kick: _Optional[_Union[HeliosGoalieKick, _Mapping]] = ..., helios_shoot: _Optional[_Union[HeliosShoot, _Mapping]] = ..., helios_offensive_planner: _Optional[_Union[HeliosOffensivePlanner, _Mapping]] = ..., helios_basic_offensive: _Optional[_Union[HeliosBasicOffensive, _Mapping]] = ..., helios_basic_move: _Optional[_Union[HeliosBasicMove, _Mapping]] = ..., helios_set_play: _Optional[_Union[HeliosSetPlay, _Mapping]] = ..., helios_penalty: _Optional[_Union[HeliosPenalty, _Mapping]] = ..., helios_communication: _Optional[_Union[HeliosCommunicaion, _Mapping]] = ...) -> None: ...
 
 class PlayerActions(_message.Message):
     __slots__ = ("actions", "ignore_preprocess")
@@ -2144,6 +2209,91 @@ class PlayerType(_message.Message):
     cycles_to_reach_max_speed: int
     player_speed_max: float
     def __init__(self, register_response: _Optional[_Union[RegisterResponse, _Mapping]] = ..., id: _Optional[int] = ..., stamina_inc_max: _Optional[float] = ..., player_decay: _Optional[float] = ..., inertia_moment: _Optional[float] = ..., dash_power_rate: _Optional[float] = ..., player_size: _Optional[float] = ..., kickable_margin: _Optional[float] = ..., kick_rand: _Optional[float] = ..., extra_stamina: _Optional[float] = ..., effort_max: _Optional[float] = ..., effort_min: _Optional[float] = ..., kick_power_rate: _Optional[float] = ..., foul_detect_probability: _Optional[float] = ..., catchable_area_l_stretch: _Optional[float] = ..., unum_far_length: _Optional[float] = ..., unum_too_far_length: _Optional[float] = ..., team_far_length: _Optional[float] = ..., team_too_far_length: _Optional[float] = ..., player_max_observation_length: _Optional[float] = ..., ball_vel_far_length: _Optional[float] = ..., ball_vel_too_far_length: _Optional[float] = ..., ball_max_observation_length: _Optional[float] = ..., flag_chg_far_length: _Optional[float] = ..., flag_chg_too_far_length: _Optional[float] = ..., flag_max_observation_length: _Optional[float] = ..., kickable_area: _Optional[float] = ..., reliable_catchable_dist: _Optional[float] = ..., max_catchable_dist: _Optional[float] = ..., real_speed_max: _Optional[float] = ..., player_speed_max2: _Optional[float] = ..., real_speed_max2: _Optional[float] = ..., cycles_to_reach_max_speed: _Optional[int] = ..., player_speed_max: _Optional[float] = ...) -> None: ...
+
+class RpcCooperativeAction(_message.Message):
+    __slots__ = ("category", "index", "sender_unum", "target_unum", "target_point", "first_ball_speed", "first_turn_moment", "first_dash_power", "first_dash_angle_relative", "duration_step", "kick_count", "turn_count", "dash_count", "final_action", "description", "parent_index")
+    CATEGORY_FIELD_NUMBER: _ClassVar[int]
+    INDEX_FIELD_NUMBER: _ClassVar[int]
+    SENDER_UNUM_FIELD_NUMBER: _ClassVar[int]
+    TARGET_UNUM_FIELD_NUMBER: _ClassVar[int]
+    TARGET_POINT_FIELD_NUMBER: _ClassVar[int]
+    FIRST_BALL_SPEED_FIELD_NUMBER: _ClassVar[int]
+    FIRST_TURN_MOMENT_FIELD_NUMBER: _ClassVar[int]
+    FIRST_DASH_POWER_FIELD_NUMBER: _ClassVar[int]
+    FIRST_DASH_ANGLE_RELATIVE_FIELD_NUMBER: _ClassVar[int]
+    DURATION_STEP_FIELD_NUMBER: _ClassVar[int]
+    KICK_COUNT_FIELD_NUMBER: _ClassVar[int]
+    TURN_COUNT_FIELD_NUMBER: _ClassVar[int]
+    DASH_COUNT_FIELD_NUMBER: _ClassVar[int]
+    FINAL_ACTION_FIELD_NUMBER: _ClassVar[int]
+    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
+    PARENT_INDEX_FIELD_NUMBER: _ClassVar[int]
+    category: RpcActionCategory
+    index: int
+    sender_unum: int
+    target_unum: int
+    target_point: RpcVector2D
+    first_ball_speed: float
+    first_turn_moment: float
+    first_dash_power: float
+    first_dash_angle_relative: float
+    duration_step: int
+    kick_count: int
+    turn_count: int
+    dash_count: int
+    final_action: bool
+    description: str
+    parent_index: int
+    def __init__(self, category: _Optional[_Union[RpcActionCategory, str]] = ..., index: _Optional[int] = ..., sender_unum: _Optional[int] = ..., target_unum: _Optional[int] = ..., target_point: _Optional[_Union[RpcVector2D, _Mapping]] = ..., first_ball_speed: _Optional[float] = ..., first_turn_moment: _Optional[float] = ..., first_dash_power: _Optional[float] = ..., first_dash_angle_relative: _Optional[float] = ..., duration_step: _Optional[int] = ..., kick_count: _Optional[int] = ..., turn_count: _Optional[int] = ..., dash_count: _Optional[int] = ..., final_action: bool = ..., description: _Optional[str] = ..., parent_index: _Optional[int] = ...) -> None: ...
+
+class RpcPredictState(_message.Message):
+    __slots__ = ("spend_time", "ball_holder_unum", "ball_position", "ball_velocity", "our_defense_line_x", "our_offense_line_x")
+    SPEND_TIME_FIELD_NUMBER: _ClassVar[int]
+    BALL_HOLDER_UNUM_FIELD_NUMBER: _ClassVar[int]
+    BALL_POSITION_FIELD_NUMBER: _ClassVar[int]
+    BALL_VELOCITY_FIELD_NUMBER: _ClassVar[int]
+    OUR_DEFENSE_LINE_X_FIELD_NUMBER: _ClassVar[int]
+    OUR_OFFENSE_LINE_X_FIELD_NUMBER: _ClassVar[int]
+    spend_time: int
+    ball_holder_unum: int
+    ball_position: RpcVector2D
+    ball_velocity: RpcVector2D
+    our_defense_line_x: float
+    our_offense_line_x: float
+    def __init__(self, spend_time: _Optional[int] = ..., ball_holder_unum: _Optional[int] = ..., ball_position: _Optional[_Union[RpcVector2D, _Mapping]] = ..., ball_velocity: _Optional[_Union[RpcVector2D, _Mapping]] = ..., our_defense_line_x: _Optional[float] = ..., our_offense_line_x: _Optional[float] = ...) -> None: ...
+
+class RpcActionState(_message.Message):
+    __slots__ = ("action", "predict_state", "evaluation")
+    ACTION_FIELD_NUMBER: _ClassVar[int]
+    PREDICT_STATE_FIELD_NUMBER: _ClassVar[int]
+    EVALUATION_FIELD_NUMBER: _ClassVar[int]
+    action: RpcCooperativeAction
+    predict_state: RpcPredictState
+    evaluation: float
+    def __init__(self, action: _Optional[_Union[RpcCooperativeAction, _Mapping]] = ..., predict_state: _Optional[_Union[RpcPredictState, _Mapping]] = ..., evaluation: _Optional[float] = ...) -> None: ...
+
+class BestPlannerActionRequest(_message.Message):
+    __slots__ = ("register_response", "pairs", "state")
+    class PairsEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: int
+        value: RpcActionState
+        def __init__(self, key: _Optional[int] = ..., value: _Optional[_Union[RpcActionState, _Mapping]] = ...) -> None: ...
+    REGISTER_RESPONSE_FIELD_NUMBER: _ClassVar[int]
+    PAIRS_FIELD_NUMBER: _ClassVar[int]
+    STATE_FIELD_NUMBER: _ClassVar[int]
+    register_response: RegisterResponse
+    pairs: _containers.MessageMap[int, RpcActionState]
+    state: State
+    def __init__(self, register_response: _Optional[_Union[RegisterResponse, _Mapping]] = ..., pairs: _Optional[_Mapping[int, RpcActionState]] = ..., state: _Optional[_Union[State, _Mapping]] = ...) -> None: ...
+
+class BestPlannerActionResponse(_message.Message):
+    __slots__ = ("index",)
+    INDEX_FIELD_NUMBER: _ClassVar[int]
+    index: int
+    def __init__(self, index: _Optional[int] = ...) -> None: ...
 
 class Empty(_message.Message):
     __slots__ = ()

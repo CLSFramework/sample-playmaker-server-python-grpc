@@ -84,6 +84,11 @@ class GameStub(object):
                 request_serializer=service__pb2.RegisterResponse.SerializeToString,
                 response_deserializer=service__pb2.Empty.FromString,
                 _registered_method=True)
+        self.GetBestPlannerAction = channel.unary_unary(
+                '/protos.Game/GetBestPlannerAction',
+                request_serializer=service__pb2.BestPlannerActionRequest.SerializeToString,
+                response_deserializer=service__pb2.BestPlannerActionResponse.FromString,
+                _registered_method=True)
 
 
 class GameServicer(object):
@@ -143,6 +148,12 @@ class GameServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetBestPlannerAction(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_GameServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -190,6 +201,11 @@ def add_GameServicer_to_server(servicer, server):
                     servicer.SendByeCommand,
                     request_deserializer=service__pb2.RegisterResponse.FromString,
                     response_serializer=service__pb2.Empty.SerializeToString,
+            ),
+            'GetBestPlannerAction': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetBestPlannerAction,
+                    request_deserializer=service__pb2.BestPlannerActionRequest.FromString,
+                    response_serializer=service__pb2.BestPlannerActionResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -435,6 +451,33 @@ class Game(object):
             '/protos.Game/SendByeCommand',
             service__pb2.RegisterResponse.SerializeToString,
             service__pb2.Empty.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetBestPlannerAction(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/protos.Game/GetBestPlannerAction',
+            service__pb2.BestPlannerActionRequest.SerializeToString,
+            service__pb2.BestPlannerActionResponse.FromString,
             options,
             channel_credentials,
             insecure,

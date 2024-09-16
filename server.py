@@ -11,7 +11,6 @@ import argparse
 
 logging.basicConfig(level=logging.DEBUG)
 
-
 class GrpcAgent:
     def __init__(self, agent_type, uniform_number) -> None:
         self.agent_type: pb2.AgentType = agent_type
@@ -35,7 +34,7 @@ class GrpcAgent:
             if state.world_model.self.is_goalie:
                 actions.append(pb2.PlayerAction(helios_goalie=pb2.HeliosGoalie()))
             elif state.world_model.self.is_kickable:
-                actions.append(pb2.PlayerAction(helios_chain_action=pb2.HeliosChainAction(lead_pass=True,
+                actions.append(pb2.PlayerAction(helios_offensive_planner=pb2.HeliosOffensivePlanner(lead_pass=True,
                                                                                   direct_pass=True,
                                                                                   through_pass=True,
                                                                                   simple_pass=True,
@@ -43,7 +42,10 @@ class GrpcAgent:
                                                                                   long_dribble=True,
                                                                                   simple_shoot=True,
                                                                                   simple_dribble=True,
-                                                                                  cross=True)))
+                                                                                  cross=True,
+                                                                                  server_side_decision=False
+                                                                                  )))
+                actions.append(pb2.PlayerAction(helios_shoot=pb2.HeliosShoot()))
             else:
                 actions.append(pb2.PlayerAction(helios_basic_move=pb2.HeliosBasicMove()))
         else:
@@ -125,15 +127,15 @@ class GameHandler(pb2_grpc.GameServicer):
                       f"agent_type: {register_request.agent_type}")
         with self.shared_lock:
             self.shared_number_of_connections.value += 1
-        logging.debug(f"Number of connections {self.shared_number_of_connections.value}")
-        team_name = register_request.team_name
-        uniform_number = register_request.uniform_number
-        agent_type = register_request.agent_type
-        self.agents[self.shared_number_of_connections.value] = GrpcAgent(agent_type, uniform_number)
-        res = pb2.RegisterResponse(client_id=self.shared_number_of_connections.value,
-                                team_name=team_name,
-                                uniform_number=uniform_number,
-                                agent_type=agent_type)
+            logging.debug(f"Number of connections {self.shared_number_of_connections.value}")
+            team_name = register_request.team_name
+            uniform_number = register_request.uniform_number
+            agent_type = register_request.agent_type
+            self.agents[self.shared_number_of_connections.value] = GrpcAgent(agent_type, uniform_number)
+            res = pb2.RegisterResponse(client_id=self.shared_number_of_connections.value,
+                                    team_name=team_name,
+                                    uniform_number=uniform_number,
+                                    agent_type=agent_type)
         return res
 
     def SendByeCommand(self, register_response: pb2.RegisterResponse, context):
@@ -142,6 +144,15 @@ class GameHandler(pb2_grpc.GameServicer):
         self.agents.pop(register_response.client_id)
             
         res = pb2.Empty()
+        return res
+    
+    def GetBestPlannerAction(self, pairs: pb2.BestPlannerActionRequest, context):
+        logging.debug(f"GetBestPlannerAction cycle:{pairs.state.world_model.cycle} pairs:{len(pairs.pairs)} unum:{pairs.state.register_response.uniform_number}")
+        pairs_list: list[int, pb2.RpcActionState] = [(k, v) for k, v in pairs.pairs.items()]
+        pairs_list.sort(key=lambda x: x[0])
+        best_action = max(pairs_list, key=lambda x: -1000 if x[1].action.parent_index != -1 else x[1].predict_state.ball_position.x)
+        logging.debug(f"Best action: {best_action[0]} {best_action[1].action.description} to {best_action[1].action.target_unum} in ({round(best_action[1].action.target_point.x, 2)},{round(best_action[1].action.target_point.y, 2)}) e:{round(best_action[1].evaluation,2)}")
+        res = pb2.BestPlannerActionResponse(index=best_action[0])
         return res
 
 def serve(port, shared_lock, shared_number_of_connections):
