@@ -12,6 +12,17 @@ class ViewWidth(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     NORMAL: _ClassVar[ViewWidth]
     WIDE: _ClassVar[ViewWidth]
 
+class RpcServerLanguageType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = ()
+    UNKNOWN_LANGUAGE: _ClassVar[RpcServerLanguageType]
+    PYThON: _ClassVar[RpcServerLanguageType]
+    JAVA: _ClassVar[RpcServerLanguageType]
+    CPP: _ClassVar[RpcServerLanguageType]
+    CSHARP: _ClassVar[RpcServerLanguageType]
+    RUBY: _ClassVar[RpcServerLanguageType]
+    JAVE_SCRIPT: _ClassVar[RpcServerLanguageType]
+    GO: _ClassVar[RpcServerLanguageType]
+
 class Side(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
     UNKNOWN: _ClassVar[Side]
@@ -110,6 +121,14 @@ class RpcActionCategory(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
 NARROW: ViewWidth
 NORMAL: ViewWidth
 WIDE: ViewWidth
+UNKNOWN_LANGUAGE: RpcServerLanguageType
+PYThON: RpcServerLanguageType
+JAVA: RpcServerLanguageType
+CPP: RpcServerLanguageType
+CSHARP: RpcServerLanguageType
+RUBY: RpcServerLanguageType
+JAVE_SCRIPT: RpcServerLanguageType
+GO: RpcServerLanguageType
 UNKNOWN: Side
 LEFT: Side
 RIGHT: Side
@@ -199,26 +218,30 @@ class RpcVector2D(_message.Message):
     def __init__(self, x: _Optional[float] = ..., y: _Optional[float] = ..., dist: _Optional[float] = ..., angle: _Optional[float] = ...) -> None: ...
 
 class RegisterRequest(_message.Message):
-    __slots__ = ("agent_type", "team_name", "uniform_number")
+    __slots__ = ("agent_type", "team_name", "uniform_number", "rpc_version")
     AGENT_TYPE_FIELD_NUMBER: _ClassVar[int]
     TEAM_NAME_FIELD_NUMBER: _ClassVar[int]
     UNIFORM_NUMBER_FIELD_NUMBER: _ClassVar[int]
+    RPC_VERSION_FIELD_NUMBER: _ClassVar[int]
     agent_type: AgentType
     team_name: str
     uniform_number: int
-    def __init__(self, agent_type: _Optional[_Union[AgentType, str]] = ..., team_name: _Optional[str] = ..., uniform_number: _Optional[int] = ...) -> None: ...
+    rpc_version: int
+    def __init__(self, agent_type: _Optional[_Union[AgentType, str]] = ..., team_name: _Optional[str] = ..., uniform_number: _Optional[int] = ..., rpc_version: _Optional[int] = ...) -> None: ...
 
 class RegisterResponse(_message.Message):
-    __slots__ = ("client_id", "agent_type", "team_name", "uniform_number")
+    __slots__ = ("client_id", "agent_type", "team_name", "uniform_number", "rpc_server_language_type")
     CLIENT_ID_FIELD_NUMBER: _ClassVar[int]
     AGENT_TYPE_FIELD_NUMBER: _ClassVar[int]
     TEAM_NAME_FIELD_NUMBER: _ClassVar[int]
     UNIFORM_NUMBER_FIELD_NUMBER: _ClassVar[int]
+    RPC_SERVER_LANGUAGE_TYPE_FIELD_NUMBER: _ClassVar[int]
     client_id: int
     agent_type: AgentType
     team_name: str
     uniform_number: int
-    def __init__(self, client_id: _Optional[int] = ..., agent_type: _Optional[_Union[AgentType, str]] = ..., team_name: _Optional[str] = ..., uniform_number: _Optional[int] = ...) -> None: ...
+    rpc_server_language_type: RpcServerLanguageType
+    def __init__(self, client_id: _Optional[int] = ..., agent_type: _Optional[_Union[AgentType, str]] = ..., team_name: _Optional[str] = ..., uniform_number: _Optional[int] = ..., rpc_server_language_type: _Optional[_Union[RpcServerLanguageType, str]] = ...) -> None: ...
 
 class Ball(_message.Message):
     __slots__ = ("position", "relative_position", "seen_position", "heard_position", "velocity", "seen_velocity", "heard_velocity", "pos_count", "seen_pos_count", "heard_pos_count", "vel_count", "seen_vel_count", "heard_vel_count", "lost_count", "ghost_count", "dist_from_self", "angle_from_self")
