@@ -49,4 +49,21 @@ Due to the popularity of python in Machine Learning & AI spaces we decided to cr
 However, using python alone was too slow as preprocessing sensor information & tasks such as localization took too long.
 
 For this reason we have split up the code into two segments:
-The data processing section in proxy, which creates a World Model (state), and passes it to python for planning to occur.
+The data processing section in proxy, which creates a World Model (state), and passes it to python for planning to occur. This repository uses gRPC to pass along the World Model, but there is a sister-repo which is compatible with thrift.
+
+![cls](https://github.com/user-attachments/assets/4daee216-1479-4acd-88f2-9e772b8c7837)
+As seen in the figure, the proxy handles connecting to the server, receiving sensor information and creating a world-model, and finds the action to take via a remote procedure call to a decision-making server, which is this repository.
+
+# Configuration
+## RoboCup Server configuration
+You can change the configuration of the RoboCup server and change parameters such as players' stamina, game length, field length, etc. by modifying `~/.rcssserver/server.conf`. Refer to the server's documents and repo for a more detailed guide.
+
+## Modifying Proxy & Running proxy and server seperately
+If you want to modify the algorithms of the base (such as ball interception, shooting, localization, etc.) you must modify the code of the [proxy repo](https://github.com/CLSFramework/soccer-simulation-proxy). After re-building from source, you can run the proxy by using `./start.sh --rpc-type grpc` in the bin folder of the proxy, and run the gRPC server with `python3 server.py` in this repo's directory. It is highly recommended to launch the python server before the proxy.
+
+You can modify the rpc port by adding the argument `--rpc-port [VALUE]`, where the default is 50051. 
+
+# Citation
+
+- [Cross Language Soccer Framework](https://arxiv.org/pdf/2406.05621)
+- Zare, N., Sayareh, A., Sadraii, A., Firouzkouhi, A. and Soares, A., 2024. Cross Language Soccer Framework: An Open Source Framework for the RoboCup 2D Soccer Simulation. arXiv preprint arXiv:2406.05621.
