@@ -283,6 +283,8 @@ message WorldModel {
   double their_defense_line_x = 33;
   double our_defense_player_line_x = 34;
   double their_defense_player_line_x = 35;
+  bool kickable_teammate_existance = 36;
+  bool kickable_opponent_existance = 37;
 }
 
 message State {
@@ -800,6 +802,8 @@ message HeliosPenalty {}
 
 message HeliosCommunicaion {}
 
+message bhv_doForceKick {}
+
 message PlayerAction {
   oneof action {
       Dash dash = 1;
@@ -866,6 +870,7 @@ message PlayerAction {
       HeliosSetPlay helios_set_play = 62;
       HeliosPenalty helios_penalty = 63;
       HeliosCommunicaion helios_communication = 64;
+      bhv_doForceKick bhv_do_force_kick = 65;
 
   }
 }
