@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# remove logs directory
+rm -rf logs
+# create logs directory
+if [ ! -d "./logs" ]; then
+  mkdir -p "./logs"
+fi
+
 # Ensure the script exits if any command fails
 set -e
 # check scripts/proxy directory does not exist, raise error
@@ -67,8 +74,10 @@ sleep 2
 
 # Start start.sh script in the correct directory with arguments
 echo "Starting start.sh with team name: $team_name and ..."
+log_dir="logs/proxy.log"
+abspath=$(realpath $log_dir)
 cd scripts/proxy
-bash start.sh -t "$team_name" --rpc-port $rpc_port --rpc-type grpc &
+bash start.sh -t "$team_name" --rpc-port $rpc_port --rpc-type grpc >> $abspath 2>&1 &
 start_pid=$!
 
 # Wait for both background processes to finish
