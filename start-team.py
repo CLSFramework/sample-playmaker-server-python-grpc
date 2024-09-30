@@ -27,7 +27,7 @@ def run_server_script(args):
 def run_start_script(args):
     # Start the start.sh script in its own directory as a new process group
     process = subprocess.Popen(
-        ['bash', 'start.sh', '-t', args.team_name, '--rpc-port', args.rpc_port, '--rpc-type', 'grpc'],
+        ['bash', 'start.sh' if not args.debug else 'start-debug.sh', '-t', args.team_name, '--rpc-port', args.rpc_port, '--rpc-type', 'grpc'],
         cwd='scripts/proxy',  # Corrected directory to where start.sh is located
         preexec_fn=os.setsid,  # Create a new session and set the process group ID
         stdout=subprocess.PIPE,
@@ -60,8 +60,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run server and team scripts.')
     parser.add_argument('-t', '--team_name', required=False, help='The name of the team', default='CLS')
     parser.add_argument('--rpc-port', required=False, help='The port of the server', default='50051')
+    parser.add_argument('-d', '--debug', required=False, help='Enable debug mode', default=False, action='store_true')
     args = parser.parse_args()
-
+    
     try:
         # Check Python requirements
         start_team_logger.debug("Checking Python requirements...")

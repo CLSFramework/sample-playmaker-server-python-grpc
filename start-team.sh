@@ -17,6 +17,7 @@ fi
 
 team_name="CLS"
 rpc_port=50051
+debug=false
 
 # help function
 usage() {
@@ -37,6 +38,9 @@ do
     --rpc-port)
       rpc_port=$2
       shift
+      ;;
+    -d|--debug)
+      debug=true
       ;;
     *)
       echo 1>&2
@@ -77,7 +81,11 @@ echo "Starting start.sh with team name: $team_name and ..."
 log_dir="logs/proxy.log"
 abspath=$(realpath $log_dir)
 cd scripts/proxy
-bash start.sh -t "$team_name" --rpc-port $rpc_port --rpc-type grpc >> $abspath 2>&1 &
+if [ "$debug" = true ]; then
+  bash start-debug.sh -t "$team_name" --rpc-port $rpc_port --rpc-type grpc >> $abspath 2>&1 &
+else
+  bash start.sh -t "$team_name" --rpc-port $rpc_port --rpc-type grpc >> $abspath 2>&1 &
+fi
 start_pid=$!
 
 # Wait for both background processes to finish
