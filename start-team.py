@@ -6,18 +6,19 @@ import logging
 import argparse
 import check_requirements
 from utils.logger_utils import setup_logger
+import datetime
 
 
 # remove logs directory
-os.system("rm -rf logs")
+log_dir = os.path.join(os.getcwd(), 'logs', datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
 
 # Set up logging
-start_team_logger = setup_logger('start-team', 'logs/start-team.log', console_level=logging.DEBUG, file_level=logging.DEBUG, console_format_str='%(message)s')
+start_team_logger = setup_logger('start-team', log_dir, console_level=logging.DEBUG, file_level=logging.DEBUG, console_format_str='%(message)s')
 
 def run_server_script(args):
     # Start the server.py script as a new process group
     process = subprocess.Popen(
-        ['python3', 'server.py', '--rpc-port', args.rpc_port],
+        ['python3', 'server.py', '--rpc-port', args.rpc_port, '--log-dir', log_dir],
         preexec_fn=os.setsid,  # Create a new session and set the process group ID
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT  # Capture stderr and redirect it to stdout
@@ -43,7 +44,7 @@ def stream_output_to_console(process, prefix):
 
 def stream_output_to_file(process, prefix):
     # Stream output from the process and log it with a prefix
-    logger = setup_logger(prefix, console_level=None, file_level=logging.DEBUG)
+    logger = setup_logger(prefix, log_dir, console_level=None, file_level=logging.DEBUG)
     for line in iter(process.stdout.readline, b''):
         logger.info(line.decode().strip())
         pass
@@ -77,8 +78,8 @@ if __name__ == "__main__":
         start_team_logger.debug(f"Started start.sh process with PID: {start_process.pid} with team name {args=}")
 
         # Monitor both processes and log their outputs
-        server_thread = threading.Thread(target=stream_output_to_console, args=(server_process, 'server:'))
-        start_thread = threading.Thread(target=stream_output_to_file, args=(start_process, 'proxy:'))
+        server_thread = threading.Thread(target=stream_output_to_console, args=(server_process, 'server'))
+        start_thread = threading.Thread(target=stream_output_to_file, args=(start_process, 'proxy'))
 
         server_thread.start()
         start_thread.start()

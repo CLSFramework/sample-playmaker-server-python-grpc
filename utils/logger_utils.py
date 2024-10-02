@@ -2,7 +2,7 @@ import logging
 import os
 
 
-def setup_logger(name, log_file=None, console_level=logging.INFO, file_level=logging.DEBUG, console_format_str=None, file_format_str=None):
+def setup_logger(name, log_dir, console_level=logging.INFO, file_level=logging.DEBUG, console_format_str=None, file_format_str=None):
     """
     Set up a logger that writes to both a file and the console, with different formats and levels.
     
@@ -14,14 +14,14 @@ def setup_logger(name, log_file=None, console_level=logging.INFO, file_level=log
     """
     have_console_handler = console_level is not None
     have_file_handler = file_level is not None
-    if log_file is None:
-        log_file = os.path.join('logs', f'{name}.log')
+    
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+        
+    log_file = os.path.join(log_dir, f'{name}.log')
     # Directory
     directory = os.path.dirname(log_file)
-    if directory and not os.path.exists(directory):
-        os.makedirs(directory)
         
-    print(f"have_console_handler={have_console_handler}, have_file_handler={have_file_handler}", log_file, directory)
     # Create a custom logger
     logger = logging.getLogger(name)
     

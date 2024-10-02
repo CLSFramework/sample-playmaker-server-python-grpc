@@ -1,11 +1,12 @@
 #!/bin/bash
 
-# remove logs directory
-rm -rf logs
-# create logs directory
-if [ ! -d "./logs" ]; then
-  mkdir -p "./logs"
+# create a log directory with the current date and time
+log_dir="logs/$(date +'%Y-%m-%d_%H-%M-%S')"
+if [ ! -d $log_dir ]; then
+  mkdir -p $log_dir
 fi
+
+abs_log_dir_path=$(realpath $log_dir)
 
 # Ensure the script exits if any command fails
 set -e
@@ -60,7 +61,7 @@ python3 check_requirements.py
 
 # Start server.py in the background
 echo "Starting server.py..."
-python3 server.py --rpc-port $rpc_port &
+python3 server.py --rpc-port $rpc_port --log-dir $abs_log_dir_path &
 server_pid=$!
 
 # Function to kill server and team processes on exit
@@ -78,13 +79,13 @@ sleep 2
 
 # Start start.sh script in the correct directory with arguments
 echo "Starting start.sh with team name: $team_name and ..."
-log_dir="logs/proxy.log"
-abspath=$(realpath $log_dir)
+
+start_log_path="$abs_log_dir_path/proxy.log"
 cd scripts/proxy
 if [ "$debug" = true ]; then
-  bash start-debug.sh -t "$team_name" --rpc-port $rpc_port --rpc-type grpc >> $abspath 2>&1 &
+  bash start-debug.sh -t "$team_name" --rpc-port $rpc_port --rpc-type grpc >> $start_log_path 2>&1 &
 else
-  bash start.sh -t "$team_name" --rpc-port $rpc_port --rpc-type grpc >> $abspath 2>&1 &
+  bash start.sh -t "$team_name" --rpc-port $rpc_port --rpc-type grpc >> $start_log_path 2>&1 &
 fi
 start_pid=$!
 
