@@ -19,8 +19,6 @@ def setup_logger(name, log_dir, console_level=logging.INFO, file_level=logging.D
         os.makedirs(log_dir)
         
     log_file = os.path.join(log_dir, f'{name}.log')
-    # Directory
-    directory = os.path.dirname(log_file)
         
     # Create a custom logger
     logger = logging.getLogger(name)
