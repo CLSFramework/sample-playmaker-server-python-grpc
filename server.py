@@ -8,12 +8,14 @@ from utils.logger_utils import setup_logger
 import logging
 import grpc
 import argparse
+import datetime
 
 
 console_logging_level = logging.INFO
 file_logging_level = logging.DEBUG
 
-main_logger = setup_logger("pmservice", "logs/pmservice.log", console_level=console_logging_level, file_level=file_logging_level)
+main_logger = None
+log_dir = None
 
 
 class GrpcAgent:
@@ -168,7 +170,7 @@ class GameHandler(pb2_grpc.GameServicer):
                                     team_name=team_name,
                                     uniform_number=uniform_number,
                                     agent_type=agent_type)
-            logger = setup_logger(f"agent{register_response.uniform_number}_{register_response.client_id}")
+            logger = setup_logger(f"agent{register_response.uniform_number}_{register_response.client_id}", log_dir)
             self.agents[self.shared_number_of_connections.value] = GrpcAgent(agent_type, uniform_number, logger)
         return register_response
 
@@ -198,13 +200,19 @@ def serve(port, shared_lock, shared_number_of_connections):
     
 
 def main():
+    global main_logger, log_dir
+    parser = argparse.ArgumentParser(description='Run play maker server')
+    parser.add_argument('-p', '--rpc-port', required=False, help='The port of the server', default=50051)
+    parser.add_argument('-l', '--log-dir', required=False, help='The directory of the log file', 
+                        default=f'logs/{datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}')
+    args = parser.parse_args()
+    log_dir = args.log_dir
+    main_logger = setup_logger("pmservice", log_dir, console_level=console_logging_level, file_level=file_logging_level)
     main_logger.info("Starting server")
     manager = Manager()
     shared_lock = Lock()  # Create a Lock for synchronization
     shared_number_of_connections = manager.Value('i', 0)
-    parser = argparse.ArgumentParser(description='Run play maker server')
-    parser.add_argument('-p', '--rpc-port', required=False, help='The port of the server', default=50051)
-    args = parser.parse_args()
+    
     serve(args.rpc_port, shared_lock, shared_number_of_connections)
     
 if __name__ == '__main__':
