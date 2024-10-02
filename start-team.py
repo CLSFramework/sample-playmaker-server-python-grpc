@@ -9,11 +9,10 @@ from utils.logger_utils import setup_logger
 import datetime
 
 
-# remove logs directory
-log_dir = os.path.join(os.getcwd(), 'logs', datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
-
 # Set up logging
+log_dir = os.path.join(os.getcwd(), 'logs', datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
 start_team_logger = setup_logger('start-team', log_dir, console_level=logging.DEBUG, file_level=logging.DEBUG, console_format_str='%(message)s')
+
 
 def run_server_script(args):
     # Start the server.py script as a new process group
