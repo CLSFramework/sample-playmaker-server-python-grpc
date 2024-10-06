@@ -66,6 +66,14 @@ Then we must run the proxy & the decisionmaking server:
 
 Launch the opponent team, start the monitor app image. press <kbd>Ctrl</kbd> + <kbd>C</kbd> to connect to the server, and <kbd>Ctrl</kbd> + <kbd>K</kbd> for kick-off!
 
+### Tutorial Video (English)
+
+TDB
+
+### Tutorial Video (Persian)
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/97YDEumcVWU?si=a5meyaRTzbgMRhXT" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 ## How to change the code
 
 The `server.py` file contains the logic in 3 main functions:
