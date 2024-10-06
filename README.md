@@ -7,18 +7,18 @@ pushd scripts
 sh download-rcssserver.sh #install RoboCup Server
 popd
 ```
-Next, install the soccer proxy, which uses C++ to read and pre-processes state data and passes them to the Python server (this project) for decision-making.
-``` Bash
-pushd scripts
-sh download-proxy.sh.sh #install C++ proxy
-popd
-```
 Clone this repository & install the required python libraries (such as gRPC). Don't forget to activate your virtual environment!
 ``` Bash
 git clone https://github.com/CLSFramework/sample-playmaker-server-python-grpc.git
 cd sample-playmaker-server-python-grpc
 # Activate venv/anaconda before this step!
 pip install -r requirements.txt
+```
+Next, install the soccer proxy, which uses C++ to read and pre-processes state data and passes them to the Python server (this project) for decision-making.
+``` Bash
+pushd scripts
+sh download-proxy.sh.sh #install C++ proxy
+popd
 ```
 Finally, download the monitor from [the original repository](https://github.com/rcsoccersim/rcssmonitor/releases) in order to view the games.
 ## Running a game
