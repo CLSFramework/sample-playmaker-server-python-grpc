@@ -1,11 +1,8 @@
 # Quick start
 ## Installation
-Install the pre-requisites and the RoboCup Soccer 2D Platform using the commands below:
+Install the pre-requisites using the command below:
 ``` Bash
 sudo apt-get install fuse #Used to run AppImages
-pushd scripts
-sh download-rcssserver.sh #install RoboCup Server
-popd
 ```
 Clone this repository & install the required python libraries (such as gRPC). Don't forget to activate your virtual environment!
 ``` Bash
@@ -14,10 +11,16 @@ cd sample-playmaker-server-python-grpc
 # Activate venv/anaconda before this step!
 pip install -r requirements.txt
 ```
+To download RoboCup Soccer 2D Platform using the commands below:
+``` Bash
+pushd scripts
+sh download-rcssserver.sh #install RoboCup Server
+popd
+```
 Next, install the soccer proxy, which uses C++ to read and pre-processes state data and passes them to the Python server (this project) for decision-making.
 ``` Bash
 pushd scripts
-sh download-proxy.sh.sh #install C++ proxy
+sh download-proxy.sh #install C++ proxy
 popd
 ```
 Finally, download the monitor from [the original repository](https://github.com/rcsoccersim/rcssmonitor/releases) in order to view the games.
