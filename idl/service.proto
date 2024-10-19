@@ -1,4 +1,5 @@
-// version 1
+
+// version 1.6
 
 syntax = "proto3";
 
@@ -102,6 +103,16 @@ enum CardType {
   RED = 2;
 }
 
+message PenaltyKickState {
+  Side on_field_side = 1;
+  Side current_taker_side = 2;
+  int32 our_taker_counter = 3;
+  int32 their_taker_counter = 4;
+  int32 our_score = 5;
+  int32 their_score = 6;
+  bool is_kick_taker = 7;
+}
+
 message Player {
   RpcVector2D  position = 1;
   RpcVector2D  seen_position = 2;
@@ -175,6 +186,8 @@ message Self {
   float recovery = 37;
   float stamina_capacity = 38;
   CardType card = 39;
+  int32 catch_time = 40;
+  float effort = 41;
 }
 
 enum InterceptActionType {
@@ -282,6 +295,13 @@ message WorldModel {
   double their_defense_line_x = 33;
   double our_defense_player_line_x = 34;
   double their_defense_player_line_x = 35;
+  bool kickable_teammate_existance = 36;
+  bool kickable_opponent_existance = 37;
+  PenaltyKickState penalty_kick_state = 38;
+  int32 see_time = 39;
+  int32 time_stopped = 40;
+  int32 set_play_count = 41;
+  Side game_mode_side = 42;
 }
 
 message State {
@@ -799,6 +819,10 @@ message HeliosPenalty {}
 
 message HeliosCommunicaion {}
 
+message bhv_doForceKick {}
+
+message bhv_doHeardPassRecieve {}
+
 message PlayerAction {
   oneof action {
       Dash dash = 1;
@@ -865,6 +889,8 @@ message PlayerAction {
       HeliosSetPlay helios_set_play = 62;
       HeliosPenalty helios_penalty = 63;
       HeliosCommunicaion helios_communication = 64;
+      bhv_doForceKick bhv_do_force_kick = 65;
+      bhv_doHeardPassRecieve bhv_do_heard_pass_recieve = 66;
 
   }
 }
@@ -872,6 +898,8 @@ message PlayerAction {
 message PlayerActions {
   repeated PlayerAction actions = 1;
   bool ignore_preprocess = 2;
+  bool ignore_doforcekick = 3;
+  bool ignore_doHeardPassRecieve = 4;
 }
 
 message ChangePlayerType {
@@ -1160,6 +1188,10 @@ message ServerParam {
   float penalty_area_half_width = 220;
   float penalty_area_length = 221;
   float goal_width = 222;
+  float goal_area_width = 223;
+  float goal_area_length = 224;
+  float center_circle_r = 225;
+  float goal_post_radius = 226;
 }
 
 message PlayerParam {

@@ -53,7 +53,7 @@ class GrpcAgent:
                                                                                   simple_shoot=True,
                                                                                   simple_dribble=True,
                                                                                   cross=True,
-                                                                                  server_side_decision=False
+                                                                                  server_side_decision=True
                                                                                   )))
                 actions.append(pb2.PlayerAction(helios_shoot=pb2.HeliosShoot()))
             else:
@@ -65,7 +65,7 @@ class GrpcAgent:
         return pb2.PlayerActions(actions=actions)
     
     def GetBestPlannerAction(self, pairs: pb2.BestPlannerActionRequest):
-        self.logger.debug(f"GetBestPlannerAction cycle:{pairs.state.world_model.cycle} pairs:{len(pairs.pairs)} unum:{pairs.state.register_response.uniform_number}")
+        self.logger.debug(f"GetBestPlannerAction cycle:{pairs.state.world_model.cycle} pairs:{len(pairs.pairs)} unum:{pairs.register_response.uniform_number}")
         pairs_list: list[int, pb2.RpcActionState] = [(k, v) for k, v in pairs.pairs.items()]
         pairs_list.sort(key=lambda x: x[0])
         best_action = max(pairs_list, key=lambda x: -1000 if x[1].action.parent_index != -1 else x[1].predict_state.ball_position.x)
@@ -183,8 +183,8 @@ class GameHandler(pb2_grpc.GameServicer):
         return res
     
     def GetBestPlannerAction(self, pairs: pb2.BestPlannerActionRequest, context):
-        main_logger.debug(f"GetBestPlannerAction cycle:{pairs.state.world_model.cycle} pairs:{len(pairs.pairs)} unum:{pairs.state.register_response.uniform_number}")
-        res = self.agents[pairs.state.register_response.client_id].GetBestPlannerAction(pairs)
+        main_logger.debug(f"GetBestPlannerAction cycle:{pairs.state.world_model.cycle} pairs:{len(pairs.pairs)} unum:{pairs.register_response.uniform_number}")
+        res = self.agents[pairs.register_response.client_id].GetBestPlannerAction(pairs)
         return res
     
 
