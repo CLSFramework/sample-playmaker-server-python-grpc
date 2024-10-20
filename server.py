@@ -53,7 +53,7 @@ class GrpcAgent:
                                                                                   simple_shoot=True,
                                                                                   simple_dribble=True,
                                                                                   cross=True,
-                                                                                  server_side_decision=True
+                                                                                  server_side_decision=False
                                                                                   )))
                 actions.append(pb2.PlayerAction(helios_shoot=pb2.HeliosShoot()))
             else:
@@ -64,13 +64,15 @@ class GrpcAgent:
         self.logger.debug(f"Actions: {actions}")
         return pb2.PlayerActions(actions=actions)
     
-    def GetBestPlannerAction(self, pairs: pb2.BestPlannerActionRequest):
-        self.logger.debug(f"GetBestPlannerAction cycle:{pairs.state.world_model.cycle} pairs:{len(pairs.pairs)} unum:{pairs.register_response.uniform_number}")
-        pairs_list: list[int, pb2.RpcActionState] = [(k, v) for k, v in pairs.pairs.items()]
-        pairs_list.sort(key=lambda x: x[0])
-        best_action = max(pairs_list, key=lambda x: -1000 if x[1].action.parent_index != -1 else x[1].predict_state.ball_position.x)
-        self.logger.debug(f"Best action: {best_action[0]} {best_action[1].action.description} to {best_action[1].action.target_unum} in ({round(best_action[1].action.target_point.x, 2)},{round(best_action[1].action.target_point.y, 2)}) e:{round(best_action[1].evaluation,2)}")
-        res = pb2.BestPlannerActionResponse(index=best_action[0])
+    def GetBestPlannerAction(self, request: pb2.BestPlannerActionRequest) -> int:
+        self.logger.debug(f"GetBestPlannerAction cycle:{request.state.world_model.cycle} pairs:{len(request.pairs)} unum:{request.state.register_response.uniform_number}")
+        best_index = max(request.pairs.items(), key=lambda x: x[1].evaluation)[0]
+        best_action = request.pairs[best_index].action
+        
+        while best_action.parent_index and best_action.parent_index > 0:
+            best_action = request.pairs[best_action.parent_index].action
+        
+        res = pb2.BestPlannerActionResponse(index=best_action.index)
         return res
     
     def GetCoachActions(self, state: pb2.State):
