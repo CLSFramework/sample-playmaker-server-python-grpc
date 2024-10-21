@@ -33,6 +33,22 @@ tar -xvf soccer-simulation-proxy.tar.gz
 
 mv soccer-simulation-proxy/* .
 
+echo "Inserting code to start.sh..."
+
+sed -i '/rpc_type="thrift"/a\
+if [ -f ".env" ]; then\n\
+    source .env\n\
+    if [ -n "$RPC_TYPE" ]; then\n\
+        rpc_type="$RPC_TYPE"\n\
+    fi\n\
+fi' start.sh
+
+
+if [ ! -f ".env" ]; then
+    echo "Creating .env file with default content..."
+    echo "RPC_TYPE=grpc" > .env
+fi
+
 rm -rf soccer-simulation-proxy
 
 rm soccer-simulation-proxy.tar.gz
