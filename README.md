@@ -1,7 +1,3 @@
----
-custom_edit_url: 'https://github.com/CLSFramework/sample-playmaker-server-python-grpc/blob/main/README.md'
----
-
 # Sample Python Base Code (gRPC)
 
 [![Documentation Status](https://readthedocs.org/projects/clsframework/badge/?version=latest)](https://clsframework.github.io/docs/introduction/)
