@@ -45,6 +45,7 @@ jobs:
 
       - name: Set up authentication using GITHUB_TOKEN
         run: |
+          cd CLSFramework.github.io
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/CLSFramework/CLSFramework.github.io.git
 
       - name: Commit and Push Changes
