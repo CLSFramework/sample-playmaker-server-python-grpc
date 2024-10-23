@@ -55,10 +55,11 @@ jobs:
           git commit -m "Update sample server documentation from README"
           git push origin update-readme-grpc-${{ steps.random.outputs.random_number }}
 
-      - name: Create Pull Request
+      - name: Create Pull Request in `CLSFramework.github.io`
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GH_TOKEN }}
+          repository: CLSFramework/CLSFramework.github.io  # Explicitly set the target repo
           branch: update-readme-grpc-${{ steps.random.outputs.random_number }}
           commit-message: "Update sample server documentation from README"
           title: "Update sample server documentation"
