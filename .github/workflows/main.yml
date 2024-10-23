@@ -1,0 +1,61 @@
+name: Update Documentation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'README.md'
+
+jobs:
+  update-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Git
+        run: |
+          git config --global user.name 'naderzare'
+          git config --global user.email 'nader.zare88@gmail.com'
+
+      - name: Check if README was updated
+        run: |
+          if git diff --name-only HEAD^ HEAD | grep 'README.md'; then
+            echo "README.md has changed"
+          else
+            echo "README.md has not changed" && exit 0
+          fi
+
+      - name: Generate random number for branch name
+        id: random
+        run: echo "::set-output name=random_number::$(shuf -i 1000-9999 -n 1)"
+
+      - name: Clone the second repository
+        run: |
+          git clone https://github.com/CLSFramework/CLSFramework.github.io.git
+          cd CLSFramework.github.io
+          
+          # Copy updated README to target directory
+          cp ../README.md docs/2-sampleserver/0-sample-python-base-code-gRPC/index.md
+
+          # Create a new branch with random number appended
+          git checkout -b update-readme-grpc-${{ steps.random.outputs.random_number }}
+
+          # Commit the changes
+          git add docs/2-sampleserver/0-sample-python-base-code-gRPC/index.md
+          git commit -m "Update sample server documentation from README"
+
+          # Push the new branch
+          git push origin update-readme-grpc-${{ steps.random.outputs.random_number }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: update-readme-grpc-${{ steps.random.outputs.random_number }}
+          commit-message: "Update sample server documentation from README"
+          title: "Update sample server documentation"
+          body: "This PR updates the sample server documentation based on changes made in README.md."
+          base: main
