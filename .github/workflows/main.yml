@@ -43,11 +43,15 @@ jobs:
           # Create a new branch with random number appended
           git checkout -b update-readme-grpc-${{ steps.random.outputs.random_number }}
 
-          # Commit the changes
+      - name: Set up authentication using GITHUB_TOKEN
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/CLSFramework/CLSFramework.github.io.git
+
+      - name: Commit and Push Changes
+        run: |
+          cd CLSFramework.github.io
           git add docs/2-sampleserver/0-sample-python-base-code-gRPC/index.md
           git commit -m "Update sample server documentation from README"
-
-          # Push the new branch
           git push origin update-readme-grpc-${{ steps.random.outputs.random_number }}
 
       - name: Create Pull Request
