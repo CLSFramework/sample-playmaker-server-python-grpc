@@ -3,10 +3,10 @@ name: Generate gRPC Code
 on:
   push:
     branches:
-      - develop  
+      - main  
   pull_request:
     branches:
-      - develop  
+      - main  
 
 jobs:
   generate:
