@@ -43,10 +43,10 @@ jobs:
           # Create a new branch with random number appended
           git checkout -b update-readme-grpc-${{ steps.random.outputs.random_number }}
 
-      - name: Set up authentication using GITHUB_TOKEN
+      - name: Set up authentication using PAT
         run: |
           cd CLSFramework.github.io
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/CLSFramework/CLSFramework.github.io.git
+          git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/CLSFramework/CLSFramework.github.io.git
 
       - name: Commit and Push Changes
         run: |
@@ -58,7 +58,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_TOKEN }}
           branch: update-readme-grpc-${{ steps.random.outputs.random_number }}
           commit-message: "Update sample server documentation from README"
           title: "Update sample server documentation"
