@@ -1,4 +1,4 @@
-# CLSF Sample Python Base Code (gRPC)
+# Sample Python Base Code (gRPC)
 
 [![Documentation Status](https://readthedocs.org/projects/clsframework/badge/?version=latest)](https://clsframework.github.io/docs/introduction/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -8,6 +8,8 @@ This repository contains a sample decision-making server for the RoboCup 2D Socc
 The Soccer Simulation Server sends the observations to the proxy, which processes the data, create state message and sends it to the decision-making server. The decision-making server then sends the actions to the proxy, and then the proxy convert actions to the server commands and sends them to the server.
 
 For more information, please refer to the [documentation](https://clsframework.github.io/).
+
+You can find more information about the services and messages in the [IDL section](../../3-idl/protobuf.md).
 
 ## Quick start
 
@@ -64,11 +66,18 @@ Then we must run the proxy & the decisionmaking server:
 ./start-team.sh
 ```
 
+### Options
+
+- `-t team_name`: Specify the team name.
+- `--rpc-port PORT`: Specify the RPC port (default: 50051).
+- `-d`: Enable debug mode.
+
+
 Launch the opponent team, start the monitor app image. press <kbd>Ctrl</kbd> + <kbd>C</kbd> to connect to the server, and <kbd>Ctrl</kbd> + <kbd>K</kbd> for kick-off!
 
 ### Tutorial Video (English)
 
-TDB
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/hH-5rkhiQHg/0.jpg)](https://www.youtube.com/watch?v=hH-5rkhiQHg)
 
 ### Tutorial Video (Persian)
 
