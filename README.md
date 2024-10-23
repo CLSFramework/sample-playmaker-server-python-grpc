@@ -3,7 +3,7 @@
 [![Documentation Status](https://readthedocs.org/projects/clsframework/badge/?version=latest)](https://clsframework.github.io/docs/introduction/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-.This repository contains a sample decision-making server for the RoboCup 2D Soccer Simulation, which allows you to create a team by using Python. This server is compatible with the [Cross Language Soccer Framework](https://arxiv.org/pdf/2406.05621). This server is written in Python and uses gRPC to communicate with the [proxy](https://github.com/CLSFramework/soccer-simulation-proxy).
+This repository contains a sample decision-making server for the RoboCup 2D Soccer Simulation, which allows you to create a team by using Python. This server is compatible with the [Cross Language Soccer Framework](https://arxiv.org/pdf/2406.05621). This server is written in Python and uses gRPC to communicate with the [proxy](https://github.com/CLSFramework/soccer-simulation-proxy).
 
 The Soccer Simulation Server sends the observations to the proxy, which processes the data, create state message and sends it to the decision-making server. The decision-making server then sends the actions to the proxy, and then the proxy convert actions to the server commands and sends them to the server.
 
@@ -139,4 +139,4 @@ You can modify the rpc port by adding the argument `--rpc-port [VALUE]`, where t
 ## Citation
 
 - [Cross Language Soccer Framework](https://arxiv.org/pdf/2406.05621)
-- Zare, N., Sayareh, A., Sadraii, A., Firouzkouhi, A. and Soares, A., 2024. Cross Language Soccer Framework: An Open Source Framework for the RoboCup 2D Soccer Simulation. arXiv preprint arXiv:2406.05621....
+- Zare, N., Sayareh, A., Sadraii, A., Firouzkouhi, A. and Soares, A., 2024. Cross Language Soccer Framework: An Open Source Framework for the RoboCup 2D Soccer Simulation. arXiv preprint arXiv:2406.05621.
