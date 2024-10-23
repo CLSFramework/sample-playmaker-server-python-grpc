@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout the sample-playmaker-server-python-grpc repository
         uses: actions/checkout@v3
 
       - name: Set up Git
@@ -32,12 +32,12 @@ jobs:
         id: random
         run: echo "::set-output name=random_number::$(shuf -i 1000-9999 -n 1)"
 
-      - name: Clone the second repository (CLSFramework.github.io)
+      - name: Clone the CLSFramework.github.io repository
         run: |
           git clone https://github.com/CLSFramework/CLSFramework.github.io.git cls-repo
           cd cls-repo
           
-          # Copy updated README to the target directory
+          # Copy updated README to target directory in the CLSFramework.github.io repository
           cp ../README.md docs/2-sampleserver/0-sample-python-base-code-gRPC/index.md
 
           # Create a new branch with a random number appended
@@ -59,7 +59,7 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GH_TOKEN }}
-          repository: CLSFramework/CLSFramework.github.io  # Target the correct repository
+          repository: CLSFramework/CLSFramework.github.io  # Explicitly set the target repo
           branch: update-readme-grpc-${{ steps.random.outputs.random_number }}
           commit-message: "Update sample server documentation from README"
           title: "Update sample server documentation"
