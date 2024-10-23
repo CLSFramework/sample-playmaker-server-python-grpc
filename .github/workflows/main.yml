@@ -43,6 +43,12 @@ jobs:
           # Create a new branch with a random number appended
           git checkout -b update-readme-grpc-${{ steps.random.outputs.random_number }}
 
+      - name: Add front matter to index.md before committing
+        run: |
+          cd cls-repo
+          # Add the custom_edit_url to the index.md file
+          sed -i '1s/^/---\ncustom_edit_url: '\''https:\/\/github.com\/CLSFramework\/sample-playmaker-server-python-grpc\/blob\/main\/README.md'\''\n---\n\n/' docs/2-sampleserver/0-sample-python-base-code-gRPC/index.md
+
       - name: Set up authentication using PAT for CLSFramework.github.io
         run: |
           cd cls-repo
