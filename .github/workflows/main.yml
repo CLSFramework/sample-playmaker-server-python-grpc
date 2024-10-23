@@ -17,8 +17,8 @@ jobs:
 
       - name: Set up Git
         run: |
-          git config --global user.name 'naderzare'
-          git config --global user.email 'nader.zare88@gmail.com'
+          git config --global user.name 'GitHub Actions Bot'
+          git config --global user.email 'actions@github.com'
 
       - name: Check if README was updated
         run: |
@@ -32,34 +32,34 @@ jobs:
         id: random
         run: echo "::set-output name=random_number::$(shuf -i 1000-9999 -n 1)"
 
-      - name: Clone the second repository
+      - name: Clone the second repository (CLSFramework.github.io)
         run: |
-          git clone https://github.com/CLSFramework/CLSFramework.github.io.git
-          cd CLSFramework.github.io
+          git clone https://github.com/CLSFramework/CLSFramework.github.io.git cls-repo
+          cd cls-repo
           
-          # Copy updated README to target directory
+          # Copy updated README to the target directory
           cp ../README.md docs/2-sampleserver/0-sample-python-base-code-gRPC/index.md
 
-          # Create a new branch with random number appended
+          # Create a new branch with a random number appended
           git checkout -b update-readme-grpc-${{ steps.random.outputs.random_number }}
 
-      - name: Set up authentication using PAT
+      - name: Set up authentication using PAT for CLSFramework.github.io
         run: |
-          cd CLSFramework.github.io
+          cd cls-repo
           git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/CLSFramework/CLSFramework.github.io.git
 
-      - name: Commit and Push Changes
+      - name: Commit and Push Changes to CLSFramework.github.io
         run: |
-          cd CLSFramework.github.io
+          cd cls-repo
           git add docs/2-sampleserver/0-sample-python-base-code-gRPC/index.md
           git commit -m "Update sample server documentation from README"
           git push origin update-readme-grpc-${{ steps.random.outputs.random_number }}
 
-      - name: Create Pull Request in `CLSFramework.github.io`
+      - name: Create Pull Request in CLSFramework.github.io
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GH_TOKEN }}
-          repository: CLSFramework/CLSFramework.github.io  # Explicitly set the target repo
+          repository: CLSFramework/CLSFramework.github.io  # Target the correct repository
           branch: update-readme-grpc-${{ steps.random.outputs.random_number }}
           commit-message: "Update sample server documentation from README"
           title: "Update sample server documentation"
