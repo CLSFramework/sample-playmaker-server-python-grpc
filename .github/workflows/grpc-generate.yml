@@ -1,0 +1,32 @@
+name: Generate gRPC Code
+
+on:
+  push:
+    branches:
+      - develop  
+  pull_request:
+    branches:
+      - develop  
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.x'  # Specify your desired Python version
+
+      - name: Install gRPC tools
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install grpcio-tools
+
+      - name: Run generate.sh
+        run: |
+          chmod +x ./generate.sh
+          ./generate.sh
