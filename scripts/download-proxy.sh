@@ -35,19 +35,7 @@ mv soccer-simulation-proxy/* .
 
 echo "Inserting code to start.sh..."
 
-sed -i '/rpc_type="thrift"/a\
-if [ -f ".env" ]; then\n\
-    source .env\n\
-    if [ -n "$RPC_TYPE" ]; then\n\
-        rpc_type="$RPC_TYPE"\n\
-    fi\n\
-fi' start.sh
-
-
-if [ ! -f ".env" ]; then
-    echo "Creating .env file with default content..."
-    echo "RPC_TYPE=grpc" > .env
-fi
+sed -i 's/rpc_type="thrift"/rpc_type="grpc"/' start.sh
 
 rm -rf soccer-simulation-proxy
 
