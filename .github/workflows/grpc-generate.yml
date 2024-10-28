@@ -3,10 +3,10 @@ name: Generate gRPC Code
 on:
   push:
     branches:
-      - main  
+      - main
   pull_request:
     branches:
-      - main  
+      - main
 
 jobs:
   generate:
@@ -15,18 +15,36 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.x'  # Specify your desired Python version
+          python-version: '3.x'
 
       - name: Install gRPC tools
         run: |
           python3 -m pip install --upgrade pip
-          pip install grpcio-tools
-
+          pip install -r requirements.txt
+      
       - name: Run generate.sh
         run: |
-          chmod +x ./generate.sh
+          chmod +x ./generate.sh  
           ./generate.sh
+      - name: Check for changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          if ! git diff --cached --quiet; then
+            git commit -m "Automated update: Generated Thrift classes"
+          else
+            echo "No changes detected, skipping commit."
+          fi
+      - name: Push changes
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
