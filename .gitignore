@@ -7,3 +7,6 @@ __pycache__/service_pb2_grpc.cpython-310.pyc
 __pycache__/service_pb2.cpython-310.pyc
 utils/__pycache__/__init__.cpython-310.pyc
 utils/__pycache__/logger_utils.cpython-310.pyc
+service_pb2_grpc.py
+service_pb2.py
+service_pb2.pyi
