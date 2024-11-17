@@ -2,8 +2,5 @@
 scripts/proxy
 scripts/rcssserver
 logs/
-__pycache__/check_requirements.cpython-310.pyc
-__pycache__/service_pb2_grpc.cpython-310.pyc
-__pycache__/service_pb2.cpython-310.pyc
-utils/__pycache__/__init__.cpython-310.pyc
-utils/__pycache__/logger_utils.cpython-310.pyc
+__pycache__/
+utils/__pycache__/

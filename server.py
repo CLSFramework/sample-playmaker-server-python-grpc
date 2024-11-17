@@ -44,6 +44,8 @@ class GrpcAgent:
             if state.world_model.self.is_goalie:
                 actions.append(pb2.PlayerAction(helios_goalie=pb2.HeliosGoalie()))
             elif state.world_model.self.is_kickable:
+                # First action has the highest priority
+                actions.append(pb2.PlayerAction(helios_shoot=pb2.HeliosShoot()))
                 actions.append(pb2.PlayerAction(helios_offensive_planner=pb2.HeliosOffensivePlanner(lead_pass=True,
                                                                                   direct_pass=True,
                                                                                   through_pass=True,
@@ -55,7 +57,6 @@ class GrpcAgent:
                                                                                   cross=True,
                                                                                   server_side_decision=False
                                                                                   )))
-                actions.append(pb2.PlayerAction(helios_shoot=pb2.HeliosShoot()))
             else:
                 actions.append(pb2.PlayerAction(helios_basic_move=pb2.HeliosBasicMove()))
         else:
